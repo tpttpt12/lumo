@@ -1,0 +1,196 @@
+<html>
+<head>
+<title>Page Title</title>
+</head>
+<body>
+
+<div style="background:linear-gradient(to bottom, #1a0000, #330000 30%, #1a0000 70%, #000); color:#fff; font-family:'Orbitron', sans-serif; max-width:600px; margin:30px auto; padding:20px; border:5px ridge #ffcc00; border-radius:15px; box-shadow: 0 0 30px rgba(255,215,0,0.7), 0 0 10px rgba(255,0,0,0.5) inset; text-align:center; position:relative; overflow:hidden;">
+
+    <!-- 배경 네온 불빛 효과 -->
+    <div style="position:absolute; top:-50px; left:-50px; width:calc(100% + 100px); height:calc(100% + 100px); background:
+        radial-gradient(circle at 10% 10%, rgba(255,0,0,0.3) 0%, transparent 30%),
+        radial-gradient(circle at 90% 20%, rgba(255,215,0,0.3) 0%, transparent 30%),
+        radial-gradient(circle at 50% 80%, rgba(255,0,255,0.2) 0%, transparent 40%);
+        animation: neon-pulse 5s infinite alternate; z-index:0; pointer-events:none;">
+    </div>
+    <style>@keyframes neon-pulse { 0% { opacity:0.6; } 100% { opacity:1; transform:scale(1.05); } }</style>
+
+    <!-- 상단 타이틀 (카지노 스타일) -->
+    <div style="margin-bottom:25px; position:relative; z-index:1;">
+        <h1 class="casino-title" data-text="K I N G's SLOT" style="font-size:2.8em; color:#ffd700; margin:0; text-transform:uppercase; letter-spacing:3px; text-shadow: 0 0 5px #fff, 0 0 10px #ffd700, 0 0 15px #ff8c00, 0 0 20px #ff0000; animation: title-flicker 2s infinite alternate;">
+            K I N G's SLOT
+        </h1>
+        <p style="font-size:1em; color:#ff69b4; margin:5px 0 0; text-shadow:0 0 3px #ff1493;">
+            <span style="animation:jackpot-text 1s infinite;">JACKPOT</span> or <span style="color:#ff4500; font-weight:bold;">BUST</span>! :: Bet Your Soul ::
+        </p>
+    </div>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+        .casino-title { position: relative; }
+        .casino-title::before { content: '★★★★★'; display:block; font-size:0.5em; color:gold; margin-bottom:5px; letter-spacing:5px; }
+        .casino-title::after { content: '★★★★★'; display:block; font-size:0.5em; color:gold; margin-top:5px; letter-spacing:5px; }
+        @keyframes title-flicker { 0%, 100% { opacity:1; } 50% { opacity:0.8; } }
+        @keyframes jackpot-text { 0%, 100% { transform:scale(1); color:#ff69b4; } 50% { transform:scale(1.1); color:#ff1493; text-shadow: 0 0 10px #ff1493; } }
+    </style>
+
+    <!-- 슬롯머신 릴 (이미지 3개) -->
+    <div class="slot-machine" style="display:flex; justify-content:space-around; align-items:center; background:rgba(0,0,0,0.5); padding:15px; border-radius:10px; margin-bottom:25px; border:3px solid #aa8800; box-shadow: inset 0 0 15px rgba(0,0,0,0.7); position:relative; z-index:1;">
+        <div class="reel-container">
+            <div class="reel" id="reel1">
+                <!-- 이미지는 JavaScript로 추가 -->
+            </div>
+        </div>
+        <div class="reel-container">
+            <div class="reel" id="reel2">
+                <!-- 이미지는 JavaScript로 추가 -->
+            </div>
+        </div>
+        <div class="reel-container">
+            <div class="reel" id="reel3">
+                <!-- 이미지는 JavaScript로 추가 -->
+            </div>
+        </div>
+    </div>
+    <style>
+        .slot-machine { height: 150px; /* 릴 높이 고정 */ }
+        .reel-container { width: 30%; height: 100%; overflow: hidden; background: #111; border: 2px solid #555; border-radius: 5px; position:relative; }
+        .reel-container::before { /* 릴 창 프레임 */
+            content:''; position:absolute; top:0; left:0; width:100%; height:100%;
+            box-shadow: inset 0 10px 10px -5px rgba(0,0,0,0.5), inset 0 -10px 10px -5px rgba(0,0,0,0.5);
+            border-radius: 5px; pointer-events:none;
+        }
+        .reel { display: flex; flex-direction: column; height:max-content; /* 이미지 개수에 따라 높이 자동 조절 */ position:relative; /* 애니메이션 기준 */ }
+        .reel img { width: 100%; height: 130px; /* 각 이미지 높이 */ object-fit: cover; border-bottom:1px solid #333; }
+    </style>
+
+    <!-- 스핀 버튼 (글리치 효과 살짝) -->
+    <button class="spin-button" onclick="spinReels()" style="background:linear-gradient(to bottom, #ff4500, #cc0000); color:#fff; border:3px outset #ff8c00; border-radius:50px; padding:12px 30px; font-size:1.5em; text-transform:uppercase; cursor:pointer; text-shadow: 0 0 5px #000; box-shadow: 0 5px 10px rgba(0,0,0,0.5); transition: all 0.1s ease; margin-bottom:20px; position:relative; z-index:1;">
+        S P I N
+    </button>
+    <style>
+        .spin-button:active { transform: translateY(2px); box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+        .spin-button.glitchy { animation: mild-glitch 0.3s infinite; } /* 스핀 중 글리치 */
+        @keyframes mild-glitch {
+          0% { transform: skewX(0deg); } 25% { transform: skewX(-1deg); }
+          50% { transform: skewX(0deg); } 75% { transform: skewX(1deg); } 100% { transform: skewX(0deg); }
+        }
+    </style>
+
+    <!-- 정보 텍스트 영역 (딜러의 코멘트처럼) -->
+    <div id="info-text" style="background:rgba(0,0,0,0.6); border:1px solid #444; padding:15px; border-radius:5px; min-height:100px; font-size:0.95em; line-height:1.6; color:#e0e0e0; text-align:left; position:relative; z-index:1;">
+        <p style="margin:0; color:#ffd700;">> 딜러 KING: "테이블에 운명을 걸어보시지. <span style="color:#ff69b4; font-style:italic;">달콤한 절망</span> 아니면 <span style="color:#ff4500; font-weight:bold;">파멸적인 쾌락</span>뿐이다."</p>
+        <p id="slot-result" style="margin-top:10px; color:#0f0; font-weight:bold;"></p>
+        <!-- 여기에 캐릭터 소개 텍스트를 넣을 수 있습니다. -->
+        <p style="margin-top:10px; color:#bbb;">
+            교도소 블랙스톤의 어둠 속, 그는 단순한 죄수가 아니다. 시스템마저 농락하는 <strong style="color:#ffcc00;">최고의 딜러</strong>이자, 절망을 배팅하는 <strong style="color:#ff4500;">게임의 지배자</strong>. 그의 손짓 하나에 운명이 갈리고, 그의 미소 뒤엔 파멸의 그림자가 도사린다. 타인의 절망은 그에게 가장 짜릿한 <strong style="color:#ff69b4; font-style:italic;">승리의 쾌감</strong>. KING의 테이블에선, 모두가 그의 게임의 일부가 될 뿐이다.
+        </p>
+    </div>
+
+    <!-- 하단 카지노 칩 장식 -->
+    <div style="margin-top:20px; position:relative; z-index:1;">
+        <span style="font-size:1.8em; color:#ff4500; margin:0 5px;">♦</span>
+        <span style="font-size:1.8em; color:#ffd700; margin:0 5px;">♣</span>
+        <span style="font-size:1.8em; color:#ff4500; margin:0 5px;">♥</span>
+        <span style="font-size:1.8em; color:#ffd700; margin:0 5px;">♠</span>
+    </div>
+
+    <script>
+        const reelImages = [ // KING의 다양한 면모를 보여줄 이미지 URL들
+            "https://zrr.kr/1BNKhn", // 기본 이미지
+            "https://zrr.kr/G4dD", // 다른 표정/분위기 1 (임의의 이미지 주소, 실제로는 다른 이미지로 교체)
+            "https://zrr.kr/N1C3", // 다른 표정/분위기 2 (임의의 이미지 주소)
+            "https://zrr.kr/t2jR", // 다른 표정/분위기 3 (임의의 이미지 주소)
+            "https://zrr.kr/P5sK"  // 다른 표정/분위기 4 (임의의 이미지 주소)
+        ];
+
+        const reels = [document.getElementById('reel1'), document.getElementById('reel2'), document.getElementById('reel3')];
+        const spinButton = document.querySelector('.spin-button');
+        const slotResultText = document.getElementById('slot-result');
+        let isSpinning = false;
+
+        // 초기 릴 설정
+        reels.forEach(reel => {
+            for (let i = 0; i < reelImages.length * 3; i++) { // 여러 번 반복해서 충분한 길이 확보
+                const img = document.createElement('img');
+                img.src = reelImages[i % reelImages.length];
+                img.alt = "Slot Image";
+                reel.appendChild(img);
+            }
+            // 초기 위치를 랜덤하게 (선택사항)
+            // reel.style.transform = `translateY(-${Math.floor(Math.random() * reelImages.length * 130)}px)`;
+        });
+
+        function spinReels() {
+            if (isSpinning) return;
+            isSpinning = true;
+            spinButton.disabled = true;
+            spinButton.classList.add('glitchy');
+            slotResultText.textContent = "Spinning... Fortune favors the bold!";
+
+            const spinPromises = reels.map((reel, index) => {
+                return new Promise(resolve => {
+                    const reelHeight = reel.scrollHeight; // 전체 릴 높이
+                    const imageHeight = 130; // 각 이미지 높이
+                    const visibleHeight = 130; // 보이는 영역 높이 (릴 컨테이너 높이와 비슷하게)
+                    const maxOffset = reelHeight - visibleHeight;
+
+                    // 최종 멈출 이미지 인덱스 (랜덤)
+                    const targetImageIndex = Math.floor(Math.random() * reelImages.length);
+                    // 최종 멈출 위치 계산: 위에서부터 targetImageIndex번째 이미지가 중앙에 오도록
+                    // 실제로는 여러 세트의 이미지가 있으므로, 해당 이미지 중 하나에 멈추도록 계산
+                    // (이미지 세트 인덱스 * 전체 이미지 세트 길이 + 타겟 이미지 인덱스) * 이미지 높이
+                    // 좀 더 간단하게, 특정 이미지 위치로 이동하도록 설정
+                    let targetPosition = (reelImages.length + targetImageIndex) * imageHeight; // 최소 한바퀴 돌고 멈추도록
+
+                    // 랜덤 스핀 시간 및 횟수
+                    const duration = 2000 + Math.random() * 1000 + index * 500; // 릴마다 약간 다른 시간
+                    reel.style.transition = `transform ${duration / 1000}s cubic-bezier(0.25, 0.1, 0.25, 1)`; // 부드러운 스핀 효과
+                    reel.style.transform = `translateY(-${targetPosition + maxOffset/2 + Math.random()*1000}px)`; // 임의로 많이 돌림 (애니메이션용)
+
+
+                    setTimeout(() => {
+                        // 최종 위치로 정확히 이동 (애니메이션 없이)
+                        reel.style.transition = 'none';
+                        // 최종 위치 조정: targetImageIndex의 이미지가 릴 컨테이너 중앙에 오도록
+                        // 한 세트의 이미지 높이 = reelImages.length * imageHeight
+                        // (n번째 세트의 targetImageIndex) 가 중앙에 오게끔.
+                        // 단순하게, targetImageIndex 가 보이도록만 조정 (애니메이션 마지막은 자연스럽게)
+                        // targetPosition 은 위에서부터의 거리이므로, 그대로 사용하되,
+                        // 여러 세트 중 어떤 세트의 targetImageIndex 가 될지는 위의 계산에 포함되어 있음.
+                        // 좀 더 정확한 중앙 정렬을 위해서는 위치 계산이 복잡해짐.
+                        // 여기서는 targetPosition으로 멈추는 것으로 단순화.
+                        // 실제 슬롯은 서버에서 결과를 받아오고, 클라이언트는 애니메이션만 보여줌.
+                        reel.style.transform = `translateY(-${targetPosition}px)`;
+                        resolve(reelImages[targetImageIndex]); // 멈춘 이미지 URL 반환
+                    }, duration);
+                });
+            });
+
+            Promise.all(spinPromises).then(results => {
+                isSpinning = false;
+                spinButton.disabled = false;
+                spinButton.classList.remove('glitchy');
+                console.log("멈춘 이미지들:", results);
+                // 결과 판정 (예시: 3개가 모두 같으면 잭팟)
+                if (results[0] === results[1] && results[1] === results[2]) {
+                    slotResultText.textContent = `★★★ JACKPOT!!! (${getImageName(results[0])}) ★★★ YOU WIN... or DO YOU?`;
+                    slotResultText.style.color = "#ffd700";
+                    // 잭팟 시 특별 효과 추가 가능
+                } else {
+                    slotResultText.textContent = `Result: ${getImageName(results[0])} - ${getImageName(results[1])} - ${getImageName(results[2])}. Try again? The house always wins.`;
+                    slotResultText.style.color = "#ff6666";
+                }
+            });
+        }
+        function getImageName(url){ // URL에서 파일명만 추출 (간단 버전)
+            try { return url.substring(url.lastIndexOf('/') + 1); } catch(e) { return "IMAGE"; }
+        }
+        // 초기 텍스트 설정
+        slotResultText.textContent = "Place your bet and pull the lever...";
+    </script>
+
+</div>
+
+</div>
+</body>
+</html>
