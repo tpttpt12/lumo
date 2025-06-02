@@ -302,7 +302,7 @@
         }
         .notepad-window .title-bar-button.close-notepad { cursor: pointer; }
 
-        @media (max-width: 640px) {
+        @media (max-width: 500px) {
             body { padding: 10px; }
             .app-wrapper { margin-top: 0; }
             .desktop-icons-area {
@@ -335,8 +335,21 @@
                  flex-grow: 1;
             }
             
-             #persona-card-content-wrapper { flex-direction: column; }
-             .char-info-right { text-align: left; margin-left: 0; margin-top: 8px; max-width: 100%;}
+#persona-card-content-wrapper { 
+                display: flex;
+                flex-direction: column;
+                align-items: stretch; 
+            }
+            .char-info-left {
+            }
+            .char-info-right { 
+                text-align: right; 
+                margin-left: 0; 
+                margin-top: 8px;
+                max-width: 100%;
+                align-self: flex-end; 
+                /* order: -1; */ /* 만약 왼쪽 정보보다 위에 보이게 하고 싶다면 주석 해제 */
+            }
         }
 
         @keyframes slide-in-from-top { from { transform: translateY(-10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
