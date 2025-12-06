@@ -190,6 +190,9 @@
 
         /* 나무위키 스타일 */
         .wiki-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             border-bottom: 1px solid #ddd;
             padding-bottom: 10px;
             margin-bottom: 10px;
@@ -199,6 +202,29 @@
             font-size: 36px;
             font-weight: 700;
             color: var(--text-color);
+            margin: 0;
+        }
+
+        .wiki-header-menu {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .wiki-header-menu span {
+            color: #666;
+            font-size: 14px;
+            cursor: default;
+        }
+
+        .wiki-header-menu span:not(:last-child)::after {
+            content: '';
+            display: inline-block;
+            width: 1px;
+            height: 12px;
+            background: #ddd;
+            margin-left: 15px;
+            vertical-align: middle;
         }
 
         .wiki-meta {
@@ -317,7 +343,7 @@
 
         .profile-table th {
             background: var(--table-header-bg);
-            color: white;
+            color: #222;
             padding: 5px 10px;
             text-align: center;
             font-weight: 500;
@@ -327,6 +353,7 @@
         .profile-table td {
             padding: 5px 10px;
             background: white;
+            line-height: 1.4;
         }
 
         .wiki-section {
@@ -480,7 +507,7 @@
 
         .wiki-table th {
             background: var(--table-header-bg);
-            color: white;
+            color: #222;
             padding: 5px 10px;
             font-weight: 500;
             border: 1px solid var(--border-color);
@@ -701,7 +728,7 @@
         <div class="form-group">
             <label>헤더 글씨색 (소개표/프로필/본문표)</label>
             <select id="headerTextColor">
-                <option value="#222">검정</option>
+                <option value="#222" selected>검정</option>
                 <option value="#fff">흰색</option>
             </select>
         </div>
@@ -733,6 +760,12 @@
                 <input type="text" id="profileImageUrl" placeholder="또는 이미지 URL 입력">
                 <img id="profileImagePreview" class="image-preview">
             </div>
+        </div>
+
+        <div class="form-group">
+            <label>데뷔일 (자동 계산)</label>
+            <input type="date" id="debutDate" value="2023-09-04">
+            <div id="debutDaysInfo" style="font-size: 12px; color: #666; margin-top: 5px;"></div>
         </div>
 
         <div class="form-group">
@@ -774,6 +807,30 @@
             <!-- 1. 대제목 -->
             <div class="wiki-header">
                 <h1 class="wiki-title">RIIZE</h1>
+                <div class="wiki-header-menu">
+                    <span style="display: flex; align-items: center; gap: 3px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 512 512" style="fill: #666;">
+                            <!-- Font Awesome Free (CC BY 4.0) -->
+                            <path d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H322.8c-3.1-8.8-3.7-18.4-1.4-27.8l15-60.1c2.8-11.3 8.6-21.5 16.8-29.7l40.3-40.3c-32.1-31-75.7-50.1-123.9-50.1H178.3zm435.5-68.3c-15.6-15.6-40.9-15.6-56.6 0l-29.4 29.4 71 71 29.4-29.4c15.6-15.6 15.6-40.9 0-56.6l-14.4-14.4zM375.9 417c-4.1 4.1-7 9.2-8.4 14.9l-15 60.1c-1.4 5.5 .2 11.2 4.2 15.2s9.7 5.6 15.2 4.2l60.1-15c5.6-1.4 10.8-4.3 14.9-8.4L576.1 358.7l-71-71L375.9 417z"/>
+                        </svg>
+                        편집
+                    </span>
+                    <span style="display: flex; align-items: center; gap: 3px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 512 512" style="fill: #666;">
+                            <!-- Font Awesome Free (CC BY 4.0) -->
+                            <path d="M208 352c114.9 0 208-78.8 208-176S322.9 0 208 0S0 78.8 0 176c0 38.6 14.7 74.3 39.6 103.4c-3.5 9.4-8.7 17.7-14.2 24.7c-4.8 6.2-9.7 11-13.3 14.3c-1.8 1.6-3.3 2.9-4.3 3.7c-.5 .4-.9 .7-1.1 .8l-.2 .2 0 0 0 0C1 327.2-1.4 334.4 .8 340.9S9.1 352 16 352c21.8 0 43.8-5.6 62.1-12.5c9.2-3.5 17.8-7.4 25.3-11.4C134.1 343.3 169.8 352 208 352zM448 176c0 112.3-99.1 196.9-216.5 207C255.8 457.4 336.4 512 432 512c38.2 0 73.9-8.7 104.7-23.9c7.5 4 16 7.9 25.2 11.4c18.3 6.9 40.3 12.5 62.1 12.5c6.9 0 13.1-4.5 15.2-11.1c2.1-6.6-.2-13.8-5.8-17.9l0 0 0 0-.2-.2c-.2-.2-.6-.4-1.1-.8c-1-.8-2.5-2-4.3-3.7c-3.6-3.3-8.5-8.1-13.3-14.3c-5.5-7-10.7-15.4-14.2-24.7c24.9-29 39.6-64.7 39.6-103.4c0-92.8-84.9-168.9-192.6-175.5c.4 5.1 .6 10.3 .6 15.5z"/>
+                        </svg>
+                        토론
+                    </span>
+                    <span style="display: flex; align-items: center; gap: 3px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 448 512" style="fill: #666;">
+                            <!-- Font Awesome Free (CC BY 4.0) -->
+                            <path d="M96 0C43 0 0 43 0 96V416c0 53 43 96 96 96H384h32c17.7 0 32-14.3 32-32s-14.3-32-32-32V384c17.7 0 32-14.3 32-32V32c0-17.7-14.3-32-32-32H384 96zm0 384H352v64H96c-17.7 0-32-14.3-32-32s14.3-32 32-32zm32-240c0-8.8 7.2-16 16-16H336c8.8 0 16 7.2 16 16s-7.2 16-16 16H144c-8.8 0-16-7.2-16-16zm16 48H336c8.8 0 16 7.2 16 16s-7.2 16-16 16H144c-8.8 0-16-7.2-16-16s7.2-16 16-16z"/>
+                        </svg>
+                        역사
+                    </span>
+                    <span style="font-size: 18px; font-weight: 700;">⋯</span>
+                </div>
             </div>
 
             <!-- 2. 최근 수정 -->
@@ -835,7 +892,7 @@
                     <div style="background: var(--namu-green); padding: 10px;">
                         <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
                             <div id="profileIntroImagePreview" style="flex: 0 0 auto;">로고</div>
-                            <div style="font-size: 40px; color: #222; font-weight: 100; line-height: 1; position: relative; top: -4px;">|</div>
+                            <div class="profile-intro-divider" style="font-size: 40px; color: #222; font-weight: 100; line-height: 1; position: relative; top: -4px;">|</div>
                             <div style="flex: 0 0 auto; font-size: 18px; font-weight: 700; display: flex; flex-direction: column; gap: 2px; align-items: flex-start; text-align: left; color: #222;">
                                 <div id="profileIntroNameEnPreview">RIIZE</div>
                                 <div id="profileIntroNameKoPreview" style="font-size: 14px; font-weight: 400;">라이즈</div>
@@ -872,12 +929,11 @@
         let sectionCounter = 0;
         let profileRows = [];
         let profileRowCounter = 0;
+        let footnotes = []; // 각주 저장
 
         // 초기 프로필 행 추가
         function initializeProfile() {
-            addProfileRow('이름', 'RIIZE');
             addProfileRow('소속', 'SM Entertainment');
-            addProfileRow('데뷔', '2023년 9월 4일');
             addProfileRow('멤버', '6명');
             addProfileRow('장르', 'K-POP, R&B, Dance');
         }
@@ -901,13 +957,22 @@
             rowDiv.className = 'profile-row-item';
             rowDiv.id = `profile-row-${row.id}`;
             
-            rowDiv.innerHTML = `
-                <input type="text" placeholder="항목명" value="${row.header}" 
-                       onkeyup="updateProfileRow(${row.id}, 'header', this.value)">
-                <input type="text" placeholder="내용" value="${row.value}" 
-                       onkeyup="updateProfileRow(${row.id}, 'value', this.value)">
-                <button class="btn btn-danger" onclick="removeProfileRow(${row.id})">×</button>
-            `;
+            // 데뷔 행은 입력 필드 표시 안 함
+            if (row.header === '데뷔') {
+                rowDiv.innerHTML = `
+                    <div style="padding: 10px; background: #f0f0f0; border-radius: 4px; color: #666; font-size: 13px;">
+                        ⏰ 데뷔일은 달력에서 자동 설정됩니다
+                    </div>
+                `;
+            } else {
+                rowDiv.innerHTML = `
+                    <input type="text" placeholder="항목명" value="${row.header}" 
+                           onkeyup="updateProfileRow(${row.id}, 'header', this.value)">
+                    <input type="text" placeholder="내용" value="${row.value}" 
+                           onkeyup="updateProfileRow(${row.id}, 'value', this.value)">
+                    <button class="btn btn-danger" onclick="removeProfileRow(${row.id})">×</button>
+                `;
+            }
             
             container.appendChild(rowDiv);
         }
@@ -971,6 +1036,11 @@
             const borderColor = color === '#fff' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.2)';
             document.querySelector('.intro-table .intro-members').style.borderBottomColor = borderColor;
             
+            // 프로필 상단 로고|이름
+            document.getElementById('profileIntroNameEnPreview').style.color = color;
+            document.getElementById('profileIntroNameKoPreview').style.color = color;
+            document.querySelector('.profile-intro-divider').style.color = color;
+            
             // 프로필 헤더
             document.querySelectorAll('.profile-table th').forEach(el => el.style.color = color);
             
@@ -1026,18 +1096,52 @@
             // 자동으로 소개표 영어명 동기화
             document.getElementById('introGroupNameEn').value = title;
             document.getElementById('introGroupNameEnPreview').textContent = title;
-            
-            // 프로필 이름 행 자동 동기화
-            const nameRow = profileRows.find(row => row.header === '이름');
-            if (nameRow) {
-                nameRow.value = title;
-                const input = document.getElementById(`profile-value-${nameRow.id}`);
-                if (input) {
-                    input.value = title;
-                }
-                updateProfilePreview();
-            }
         });
+
+        // 데뷔일 자동 계산
+        document.getElementById('debutDate').addEventListener('change', function() {
+            const debutDate = new Date(this.value);
+            const today = new Date();
+            const diffTime = today - debutDate;
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            
+            // 날짜 포맷팅 (YYYY년 M월 D일)
+            const year = debutDate.getFullYear();
+            const month = debutDate.getMonth() + 1;
+            const day = debutDate.getDate();
+            const formattedDate = `${year}년 ${month}월 ${day}일`;
+            
+            // 프로필 데뷔 행 찾기 (없으면 생성)
+            let debutRow = profileRows.find(row => row.header === '데뷔');
+            if (!debutRow) {
+                // 맨 앞에 데뷔 행 추가
+                profileRowCounter++;
+                debutRow = {
+                    id: profileRowCounter,
+                    header: '데뷔',
+                    value: ''
+                };
+                profileRows.unshift(debutRow); // 맨 앞에 추가
+                renderProfileRowEditor(debutRow);
+            }
+            
+            // 값 업데이트
+            debutRow.value = `${formattedDate}<br><span style="font-size: 12px; color: #666; line-height: 1.2;">(데뷔일로부터 <strong>+${diffDays}</strong>일)</span>`;
+            
+            // 입력 필드도 업데이트
+            const input = document.getElementById(`profile-value-${debutRow.id}`);
+            if (input) {
+                input.value = `${formattedDate} (데뷔 +${diffDays}일)`;
+            }
+            
+            updateProfilePreview();
+            
+            // 정보 표시
+            document.getElementById('debutDaysInfo').textContent = `데뷔 +${diffDays}일`;
+        });
+
+        // 초기 로드시 데뷔일 계산
+        document.getElementById('debutDate').dispatchEvent(new Event('change'));
 
         // 프로필 이미지 업로드
         document.getElementById('profileImage').addEventListener('change', function(e) {
@@ -1129,6 +1233,7 @@
             const sectionDiv = document.createElement('div');
             sectionDiv.className = 'section-item';
             sectionDiv.id = `section-${section.id}`;
+            sectionDiv.draggable = true;
 
             let editorHTML = `
                 <div class="section-header">
@@ -1164,10 +1269,12 @@
                             <div class="text-toolbar">
                                 <button onclick="insertTextFormat(${section.id}, 'bold')"><b>B</b></button>
                                 <button onclick="insertTextFormat(${section.id}, 'maincolor')">🎨 대표색</button>
+                                <button onclick="insertTextFormat(${section.id}, 'footnote')">📝 각주</button>
+                                <button onclick="insertTextFormat(${section.id}, 'bullet')">• 불릿</button>
                                 <button onclick="insertTextFormat(${section.id}, 'quote')">❝ 인용</button>
                             </div>
                             <textarea id="content-${section.id}" 
-                                      placeholder="텍스트 내용을 입력하세요&#10;&#10;서식:&#10;*굵게* = 굵게&#10;[대표색] = 대표색&#10;> 인용문 = 인용" 
+                                      placeholder="텍스트 내용을 입력하세요&#10;&#10;서식:&#10;*굵게* = 굵게&#10;[대표색] = 대표색&#10;{각주내용} = 각주&#10;- 불릿 = • 불릿&#10;-- 불릿2 = ◦ 불릿 (2단)&#10;> 인용문 = 인용" 
                                       onkeyup="updateSectionData(${section.id}, 'content', this.value)"
                                       style="min-height: 120px;"></textarea>
                         </div>
@@ -1234,11 +1341,66 @@
             }
 
             sectionDiv.innerHTML = editorHTML;
+            
+            // 드래그 이벤트 추가
+            sectionDiv.addEventListener('dragstart', handleDragStart);
+            sectionDiv.addEventListener('dragover', handleDragOver);
+            sectionDiv.addEventListener('drop', handleDrop);
+            sectionDiv.addEventListener('dragend', handleDragEnd);
+            
             sectionsList.appendChild(sectionDiv);
 
             if (section.type === 'table') {
                 renderTableEditor(section);
             }
+        }
+
+        let draggedElement = null;
+
+        function handleDragStart(e) {
+            draggedElement = this;
+            this.style.opacity = '0.4';
+        }
+
+        function handleDragOver(e) {
+            if (e.preventDefault) {
+                e.preventDefault();
+            }
+            e.dataTransfer.dropEffect = 'move';
+            return false;
+        }
+
+        function handleDrop(e) {
+            if (e.stopPropagation) {
+                e.stopPropagation();
+            }
+
+            if (draggedElement !== this) {
+                const allSections = [...document.querySelectorAll('.section-item')];
+                const draggedIndex = allSections.indexOf(draggedElement);
+                const targetIndex = allSections.indexOf(this);
+
+                // sections 배열 순서 변경
+                const draggedSection = sections[draggedIndex];
+                sections.splice(draggedIndex, 1);
+                sections.splice(targetIndex, 0, draggedSection);
+
+                // DOM 순서 변경
+                const container = document.getElementById('sections-list');
+                if (draggedIndex < targetIndex) {
+                    container.insertBefore(draggedElement, this.nextSibling);
+                } else {
+                    container.insertBefore(draggedElement, this);
+                }
+
+                updatePreview();
+            }
+
+            return false;
+        }
+
+        function handleDragEnd(e) {
+            this.style.opacity = '1';
         }
 
         function getSectionTypeLabel(type) {
@@ -1265,6 +1427,12 @@
                     break;
                 case 'maincolor':
                     replacement = `[${selectedText || '대표색'}]`;
+                    break;
+                case 'footnote':
+                    replacement = `{${selectedText || '각주 내용'}}`;
+                    break;
+                case 'bullet':
+                    replacement = `- ${selectedText || '불릿'}`;
                     break;
                 case 'quote':
                     replacement = `> ${selectedText || '인용문'}`;
@@ -1629,14 +1797,33 @@
             // 굵게 - *텍스트*
             text = text.replace(/\*(.*?)\*/g, '<strong>$1</strong>');
             
+            // 각주 - {주석내용} (임시 마커 사용)
+            text = text.replace(/\{(.*?)\}/g, function(match, content) {
+                footnotes.push(content);
+                const escaped = content.replace(/"/g, '&quot;');
+                return `<span style="color: var(--namu-green); cursor: help; font-size: 11px; vertical-align: super;" title="${escaped}">___FOOTNOTE_${footnotes.length}___</span>`;
+            });
+            
             // 대표컬러 - [텍스트]
             text = text.replace(/\[(.*?)\]/g, '<span style="color: var(--namu-green);">$1</span>');
             
-            // 인용 - 인라인으로
-            text = text.replace(/^>\s*(.+)$/gm, '<span style="border-left: 3px solid var(--namu-green); padding-left: 15px; color: #666; font-style: italic; display: inline-block; margin: 0 5px;">$1</span>');
+            // 각주 번호 복원
+            text = text.replace(/___FOOTNOTE_(\d+)___/g, '[$1]');
             
             // 줄바꿈
             text = text.replace(/\n/g, '<br>');
+            
+            // 불릿 리스트 - 2단 (-- 먼저 처리) (줄바꿈 후 처리)
+            text = text.replace(/<br>--\s*(.+?)(<br>|$)/g, '<br><div style="padding-left: 40px; position: relative;"><span style="position: absolute; left: 20px;">◦</span> $1</div>');
+            text = text.replace(/^--\s*(.+?)(<br>|$)/, '<div style="padding-left: 40px; position: relative;"><span style="position: absolute; left: 20px;">◦</span> $1</div>');
+            
+            // 불릿 리스트 - 1단 (줄바꿈 후 처리)
+            text = text.replace(/<br>-\s*(.+?)(<br>|$)/g, '<br><div style="padding-left: 20px; position: relative;"><span style="position: absolute; left: 0;">•</span> $1</div>');
+            text = text.replace(/^-\s*(.+?)(<br>|$)/, '<div style="padding-left: 20px; position: relative;"><span style="position: absolute; left: 0;">•</span> $1</div>');
+            
+            // 인용 - 박스 스타일 (줄바꿈 후 처리)
+            text = text.replace(/<br>>\s*(.+?)(<br>|$)/g, '<br><div style="display: inline-block; background: #f8f9fa; border: 1px solid #ddd; border-left: 4px solid var(--namu-green); padding: 10px; margin: 10px 0; color: #555;">$1</div>');
+            text = text.replace(/^>\s*(.+?)(<br>|$)/, '<div style="display: inline-block; background: #f8f9fa; border: 1px solid #ddd; border-left: 4px solid var(--namu-green); padding: 10px; margin: 10px 0; color: #555;">$1</div>');
             
             return text;
         }
@@ -1645,6 +1832,9 @@
         function updatePreview() {
             const container = document.getElementById('dynamicContent');
             container.innerHTML = '';
+            
+            // 각주 초기화
+            footnotes = [];
 
             let headingCounters = [0, 0, 0, 0];
             let tocHTML = '';
@@ -1770,6 +1960,18 @@
                     container.innerHTML += sectionHTML;
                 }
             });
+            
+            // 각주가 있으면 맨 아래 추가
+            if (footnotes.length > 0) {
+                let footnotesHTML = '<div class="wiki-footnotes" style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd;">';
+                footnotesHTML += '<h3 style="font-size: 20px; font-weight: 700; margin-bottom: 15px;">각주</h3>';
+                footnotesHTML += '<ol style="font-size: 14px; line-height: 1.8; padding-left: 20px;">';
+                footnotes.forEach((note, index) => {
+                    footnotesHTML += `<li id="fn-${index + 1}" style="margin-bottom: 8px;">${note}</li>`;
+                });
+                footnotesHTML += '</ol></div>';
+                container.innerHTML += footnotesHTML;
+            }
 
             document.getElementById('tocList').innerHTML = tocHTML || '<li style="color: #999;">목차가 비어있습니다</li>';
         }
