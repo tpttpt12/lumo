@@ -82,7 +82,7 @@
         .image-preview {
             width: 100%;
             max-height: 200px;
-            object-fit: cover;
+            object-fit: contain;
             border-radius: 4px;
             display: none;
         }
@@ -186,6 +186,7 @@
             width: 1000px;
             margin: 0 auto;
             padding: 40px 20px;
+            box-sizing: border-box;
         }
 
         /* 나무위키 스타일 */
@@ -269,7 +270,7 @@
             padding: 20px;
             margin-bottom: 30px;
             border: 1px solid #ddd;
-            max-width: 190px;
+            max-width: 210px;
         }
 
         .wiki-toc-title {
@@ -424,7 +425,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 0;
             color: white;
             padding: 10px 0 7px 0;
         }
@@ -441,6 +442,7 @@
             align-self: center;
             position: relative;
             top: -4px;
+            padding: 0 7px;
         }
 
         .intro-table .intro-name {
@@ -524,6 +526,11 @@
             margin: 0 auto;
             max-width: 100%;
             height: auto;
+            padding: 0;
+        }
+        
+        .wiki-table td:has(img) {
+            padding: 0;
         }
 
         .wiki-image {
@@ -772,6 +779,23 @@
             <button class="btn btn-primary" onclick="addProfileRow()" style="width: 100%;">➕ 프로필 항목 추가</button>
         </div>
 
+        <div class="form-group">
+            <div style="display: flex; gap: 10px;">
+                <label style="flex: 1; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; display: flex; align-items: center; gap: 8px; cursor: pointer; background: white;">
+                    <input type="checkbox" id="snsYoutube" onchange="updateSNSLinks()" style="width: auto; margin: 0; flex-shrink: 0;">
+                    <span style="font-size: 14px;">유튜브</span>
+                </label>
+                <label style="flex: 1; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; display: flex; align-items: center; gap: 8px; cursor: pointer; background: white;">
+                    <input type="checkbox" id="snsX" onchange="updateSNSLinks()" style="width: auto; margin: 0; flex-shrink: 0;">
+                    <span style="font-size: 14px;">X</span>
+                </label>
+                <label style="flex: 1; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; display: flex; align-items: center; gap: 8px; cursor: pointer; background: white;">
+                    <input type="checkbox" id="snsInstagram" onchange="updateSNSLinks()" style="width: auto; margin: 0; flex-shrink: 0;">
+                    <span style="font-size: 14px;">인스타</span>
+                </label>
+            </div>
+        </div>
+
         <div id="profile-rows-list">
             <!-- 동적으로 추가되는 프로필 행들 -->
         </div>
@@ -809,21 +833,21 @@
                 <h1 class="wiki-title">RIIZE</h1>
                 <div class="wiki-header-menu">
                     <span style="display: flex; align-items: center; gap: 3px;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 512 512" style="fill: #666;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 640 512" style="fill: #666; overflow: visible;">
                             <!-- Font Awesome Free (CC BY 4.0) -->
                             <path d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H322.8c-3.1-8.8-3.7-18.4-1.4-27.8l15-60.1c2.8-11.3 8.6-21.5 16.8-29.7l40.3-40.3c-32.1-31-75.7-50.1-123.9-50.1H178.3zm435.5-68.3c-15.6-15.6-40.9-15.6-56.6 0l-29.4 29.4 71 71 29.4-29.4c15.6-15.6 15.6-40.9 0-56.6l-14.4-14.4zM375.9 417c-4.1 4.1-7 9.2-8.4 14.9l-15 60.1c-1.4 5.5 .2 11.2 4.2 15.2s9.7 5.6 15.2 4.2l60.1-15c5.6-1.4 10.8-4.3 14.9-8.4L576.1 358.7l-71-71L375.9 417z"/>
                         </svg>
                         편집
                     </span>
                     <span style="display: flex; align-items: center; gap: 3px;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 512 512" style="fill: #666;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 640 512" style="fill: #666; overflow: visible;">
                             <!-- Font Awesome Free (CC BY 4.0) -->
                             <path d="M208 352c114.9 0 208-78.8 208-176S322.9 0 208 0S0 78.8 0 176c0 38.6 14.7 74.3 39.6 103.4c-3.5 9.4-8.7 17.7-14.2 24.7c-4.8 6.2-9.7 11-13.3 14.3c-1.8 1.6-3.3 2.9-4.3 3.7c-.5 .4-.9 .7-1.1 .8l-.2 .2 0 0 0 0C1 327.2-1.4 334.4 .8 340.9S9.1 352 16 352c21.8 0 43.8-5.6 62.1-12.5c9.2-3.5 17.8-7.4 25.3-11.4C134.1 343.3 169.8 352 208 352zM448 176c0 112.3-99.1 196.9-216.5 207C255.8 457.4 336.4 512 432 512c38.2 0 73.9-8.7 104.7-23.9c7.5 4 16 7.9 25.2 11.4c18.3 6.9 40.3 12.5 62.1 12.5c6.9 0 13.1-4.5 15.2-11.1c2.1-6.6-.2-13.8-5.8-17.9l0 0 0 0-.2-.2c-.2-.2-.6-.4-1.1-.8c-1-.8-2.5-2-4.3-3.7c-3.6-3.3-8.5-8.1-13.3-14.3c-5.5-7-10.7-15.4-14.2-24.7c24.9-29 39.6-64.7 39.6-103.4c0-92.8-84.9-168.9-192.6-175.5c.4 5.1 .6 10.3 .6 15.5z"/>
                         </svg>
                         토론
                     </span>
                     <span style="display: flex; align-items: center; gap: 3px;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 448 512" style="fill: #666;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 448 512" style="fill: #666; overflow: visible;">
                             <!-- Font Awesome Free (CC BY 4.0) -->
                             <path d="M96 0C43 0 0 43 0 96V416c0 53 43 96 96 96H384h32c17.7 0 32-14.3 32-32s-14.3-32-32-32V384c17.7 0 32-14.3 32-32V32c0-17.7-14.3-32-32-32H384 96zm0 384H352v64H96c-17.7 0-32-14.3-32-32s14.3-32 32-32zm32-240c0-8.8 7.2-16 16-16H336c8.8 0 16 7.2 16 16s-7.2 16-16 16H144c-8.8 0-16-7.2-16-16zm16 48H336c8.8 0 16 7.2 16 16s-7.2 16-16 16H144c-8.8 0-16-7.2-16-16s7.2-16 16-16z"/>
                         </svg>
@@ -890,9 +914,9 @@
 
                 <aside class="profile-box">
                     <div style="background: var(--namu-green); padding: 10px;">
-                        <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 0;">
                             <div id="profileIntroImagePreview" style="flex: 0 0 auto;">로고</div>
-                            <div class="profile-intro-divider" style="font-size: 40px; color: #222; font-weight: 100; line-height: 1; position: relative; top: -4px;">|</div>
+                            <div class="profile-intro-divider" style="font-size: 40px; color: #222; font-weight: 100; line-height: 1; position: relative; top: -4px; padding: 0 7px;">|</div>
                             <div style="flex: 0 0 auto; font-size: 18px; font-weight: 700; display: flex; flex-direction: column; gap: 2px; align-items: flex-start; text-align: left; color: #222;">
                                 <div id="profileIntroNameEnPreview">RIIZE</div>
                                 <div id="profileIntroNameKoPreview" style="font-size: 14px; font-weight: 400;">라이즈</div>
@@ -957,13 +981,9 @@
             rowDiv.className = 'profile-row-item';
             rowDiv.id = `profile-row-${row.id}`;
             
-            // 데뷔 행은 입력 필드 표시 안 함
+            // 데뷔 행은 표시 안 함
             if (row.header === '데뷔') {
-                rowDiv.innerHTML = `
-                    <div style="padding: 10px; background: #f0f0f0; border-radius: 4px; color: #666; font-size: 13px;">
-                        ⏰ 데뷔일은 달력에서 자동 설정됩니다
-                    </div>
-                `;
+                rowDiv.style.display = 'none';
             } else {
                 rowDiv.innerHTML = `
                     <input type="text" placeholder="항목명" value="${row.header}" 
@@ -1006,7 +1026,32 @@
                 }
             });
             
+            // SNS 링크 추가
+            const snsLinks = [];
+            if (document.getElementById('snsYoutube')?.checked) {
+                snsLinks.push('<img src="https://i.imgur.com/5p2rB6Y.png" style="width: 20px; height: 20px; vertical-align: middle;">');
+            }
+            if (document.getElementById('snsX')?.checked) {
+                snsLinks.push('<img src="https://i.imgur.com/Y18hMJ6.png" style="width: 20px; height: 20px; vertical-align: middle;">');
+            }
+            if (document.getElementById('snsInstagram')?.checked) {
+                snsLinks.push('<img src="https://i.imgur.com/xon7TFi.png" style="width: 20px; height: 20px; vertical-align: middle;">');
+            }
+            
+            if (snsLinks.length > 0) {
+                html += `
+                    <tr>
+                        <th>링크</th>
+                        <td style="text-align: center;">${snsLinks.join(' <span style="color: #ddd; margin: 0 5px;">│</span> ')}</td>
+                    </tr>
+                `;
+            }
+            
             table.innerHTML = html;
+        }
+
+        function updateSNSLinks() {
+            updateProfilePreview();
         }
 
         // 분류 및 메타 정보 업데이트
@@ -1054,7 +1099,9 @@
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(event) {
-                    const imgHTML = `<img src="${event.target.result}" style="max-height: 60px; border-radius: 6px;">`;
+                    const base64 = event.target.result;
+                    document.getElementById('introImageUrl').value = base64; // 저장용
+                    const imgHTML = `<img src="${base64}" style="max-height: 60px; border-radius: 6px;">`;
                     document.getElementById('introImagePreview').innerHTML = imgHTML;
                     document.getElementById('profileIntroImagePreview').innerHTML = imgHTML;
                 };
@@ -1149,12 +1196,14 @@
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(event) {
+                    const base64 = event.target.result;
+                    document.getElementById('profileImageUrl').value = base64; // 저장용
                     const img = document.getElementById('profileImagePreview');
-                    img.src = event.target.result;
+                    img.src = base64;
                     img.classList.add('show');
                     
                     document.getElementById('previewProfileImage').innerHTML = 
-                        `<img src="${event.target.result}" alt="프로필">`;
+                        `<img src="${base64}" alt="프로필">`;
                 };
                 reader.readAsDataURL(file);
             }
@@ -1814,16 +1863,16 @@
             text = text.replace(/\n/g, '<br>');
             
             // 불릿 리스트 - 2단 (-- 먼저 처리) (줄바꿈 후 처리)
-            text = text.replace(/<br>--\s*(.+?)(<br>|$)/g, '<br><div style="padding-left: 40px; position: relative;"><span style="position: absolute; left: 20px;">◦</span> $1</div>');
-            text = text.replace(/^--\s*(.+?)(<br>|$)/, '<div style="padding-left: 40px; position: relative;"><span style="position: absolute; left: 20px;">◦</span> $1</div>');
+            text = text.replace(/<br>--\s*([^<]+)/g, '<div style="padding-left: 40px; position: relative; margin: 3px 0;"><span style="position: absolute; left: 20px;">◦</span> $1</div>');
+            text = text.replace(/^--\s*([^<]+)/, '<div style="padding-left: 40px; position: relative; margin: 3px 0;"><span style="position: absolute; left: 20px;">◦</span> $1</div>');
             
             // 불릿 리스트 - 1단 (줄바꿈 후 처리)
-            text = text.replace(/<br>-\s*(.+?)(<br>|$)/g, '<br><div style="padding-left: 20px; position: relative;"><span style="position: absolute; left: 0;">•</span> $1</div>');
-            text = text.replace(/^-\s*(.+?)(<br>|$)/, '<div style="padding-left: 20px; position: relative;"><span style="position: absolute; left: 0;">•</span> $1</div>');
+            text = text.replace(/<br>-\s*([^<]+)/g, '<div style="padding-left: 20px; position: relative; margin: 3px 0;"><span style="position: absolute; left: 0;">•</span> $1</div>');
+            text = text.replace(/^-\s*([^<]+)/, '<div style="padding-left: 20px; position: relative; margin: 3px 0;"><span style="position: absolute; left: 0;">•</span> $1</div>');
             
-            // 인용 - 박스 스타일 (줄바꿈 후 처리)
-            text = text.replace(/<br>>\s*(.+?)(<br>|$)/g, '<br><div style="display: inline-block; background: #f8f9fa; border: 1px solid #ddd; border-left: 4px solid var(--namu-green); padding: 10px; margin: 10px 0; color: #555;">$1</div>');
-            text = text.replace(/^>\s*(.+?)(<br>|$)/, '<div style="display: inline-block; background: #f8f9fa; border: 1px solid #ddd; border-left: 4px solid var(--namu-green); padding: 10px; margin: 10px 0; color: #555;">$1</div>');
+            // 인용 - 박스 스타일 (줄바꿈 후 처리) - 선 6px
+            text = text.replace(/<br>>\s*([^<]+)/g, '<div style="display: inline-block; background: #f8f9fa; border: 1px solid #ddd; border-left: 6px solid var(--namu-green); padding: 10px; margin: 10px 0; color: #555;">$1</div>');
+            text = text.replace(/^>\s*([^<]+)/, '<div style="display: inline-block; background: #f8f9fa; border: 1px solid #ddd; border-left: 6px solid var(--namu-green); padding: 10px; margin: 10px 0; color: #555;">$1</div>');
             
             return text;
         }
@@ -1964,10 +2013,9 @@
             // 각주가 있으면 맨 아래 추가
             if (footnotes.length > 0) {
                 let footnotesHTML = '<div class="wiki-footnotes" style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd;">';
-                footnotesHTML += '<h3 style="font-size: 20px; font-weight: 700; margin-bottom: 15px;">각주</h3>';
-                footnotesHTML += '<ol style="font-size: 14px; line-height: 1.8; padding-left: 20px;">';
+                footnotesHTML += '<ol style="font-size: 14px; line-height: 1.8; padding-left: 20px; list-style: none;">';
                 footnotes.forEach((note, index) => {
-                    footnotesHTML += `<li id="fn-${index + 1}" style="margin-bottom: 8px;">${note}</li>`;
+                    footnotesHTML += `<li id="fn-${index + 1}" style="margin-bottom: 8px;"><span style="color: var(--namu-green);">[${index + 1}]</span> ${note}</li>`;
                 });
                 footnotesHTML += '</ol></div>';
                 container.innerHTML += footnotesHTML;
@@ -1979,20 +2027,25 @@
         // 캡처 기능
         async function captureWiki() {
             const preview = document.getElementById('wiki-preview');
+            const pageTitle = document.getElementById('pageTitle').value || 'wiki';
+            
             try {
                 const canvas = await html2canvas(preview, {
                     backgroundColor: '#ffffff',
-                    scale: 1
+                    scale: 1,
+                    useCORS: true,
+                    allowTaint: true,
+                    logging: true
                 });
                 
                 const link = document.createElement('a');
-                link.download = `wiki-${Date.now()}.png`;
-                link.href = canvas.toDataURL();
+                link.download = `${pageTitle}.png`;
+                link.href = canvas.toDataURL('image/png');
                 link.click();
                 
                 alert('✅ 캡처가 완료되었습니다!');
             } catch (error) {
-                alert('❌ 캡처 중 오류가 발생했습니다.');
+                alert('❌ 캡처 중 오류가 발생했습니다: ' + error.message);
                 console.error(error);
             }
         }
@@ -2003,12 +2056,18 @@
                 pageTitle: document.getElementById('pageTitle').value,
                 categories: document.getElementById('categories').value,
                 lastModified: document.getElementById('lastModified').value,
+                debutDate: document.getElementById('debutDate').value,
+                headerTextColor: document.getElementById('headerTextColor').value,
                 introImageUrl: document.getElementById('introImageUrl').value,
                 introGroupNameEn: document.getElementById('introGroupNameEn').value,
                 introGroupNameKo: document.getElementById('introGroupNameKo').value,
                 introMembers: document.getElementById('introMembers').value,
+                introLinks: document.getElementById('introLinks').value,
                 profileImageUrl: document.getElementById('profileImageUrl').value,
                 profileRows: profileRows,
+                snsYoutube: document.getElementById('snsYoutube')?.checked || false,
+                snsX: document.getElementById('snsX')?.checked || false,
+                snsInstagram: document.getElementById('snsInstagram')?.checked || false,
                 sections: sections,
                 theme: document.getElementById('themeColor').value
             };
@@ -2017,7 +2076,7 @@
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
-            link.download = `wiki-${Date.now()}.json`;
+            link.download = `${data.pageTitle || 'wiki'}-${Date.now()}.json`;
             link.click();
             URL.revokeObjectURL(url);
             
@@ -2041,16 +2100,61 @@
                         document.getElementById('pageTitle').value = data.pageTitle || '';
                         document.getElementById('categories').value = data.categories || '';
                         document.getElementById('lastModified').value = data.lastModified || '';
+                        document.getElementById('debutDate').value = data.debutDate || '2023-09-04';
+                        document.getElementById('headerTextColor').value = data.headerTextColor || '#222';
                         document.getElementById('introImageUrl').value = data.introImageUrl || '';
                         document.getElementById('introGroupNameEn').value = data.introGroupNameEn || '';
                         document.getElementById('introGroupNameKo').value = data.introGroupNameKo || '';
                         document.getElementById('introMembers').value = data.introMembers || '';
+                        document.getElementById('introLinks').value = data.introLinks || '';
                         document.getElementById('profileImageUrl').value = data.profileImageUrl || '';
+                        
+                        if (data.snsYoutube !== undefined) document.getElementById('snsYoutube').checked = data.snsYoutube;
+                        if (data.snsX !== undefined) document.getElementById('snsX').checked = data.snsX;
+                        if (data.snsInstagram !== undefined) document.getElementById('snsInstagram').checked = data.snsInstagram;
                         
                         if (data.theme) {
                             document.getElementById('themeColor').value = data.theme;
                             document.getElementById('themeColorText').value = data.theme;
                             applyTheme(data.theme);
+                        }
+                        
+                        // 데뷔일 이벤트 트리거
+                        document.getElementById('debutDate').dispatchEvent(new Event('change'));
+                        
+                        // 헤더 색상 이벤트 트리거
+                        document.getElementById('headerTextColor').dispatchEvent(new Event('change'));
+                        
+                        // 소개표 이미지 복원
+                        if (data.introImageUrl) {
+                            const imgHTML = `<img src="${data.introImageUrl}" style="max-height: 60px; border-radius: 6px;">`;
+                            document.getElementById('introImagePreview').innerHTML = imgHTML;
+                            document.getElementById('profileIntroImagePreview').innerHTML = imgHTML;
+                        }
+                        
+                        // 소개표 이름 복원
+                        document.getElementById('introGroupNameEnPreview').textContent = data.introGroupNameEn || '';
+                        document.getElementById('introGroupNameKoPreview').textContent = data.introGroupNameKo || '';
+                        document.getElementById('profileIntroNameEnPreview').textContent = data.introGroupNameEn || '';
+                        document.getElementById('profileIntroNameKoPreview').textContent = data.introGroupNameKo || '';
+                        
+                        // 소개표 멤버 복원
+                        document.getElementById('introMembersPreview').innerHTML = (data.introMembers || '').split(',').map(m => 
+                            `<div class="member-item">${m.trim()}</div>`
+                        ).join('');
+                        
+                        // 소개표 링크 복원  
+                        document.getElementById('introLinksPreview').innerHTML = (data.introLinks || '').split('\n').map(link => 
+                            `<div class="intro-link-item">${link.trim()}</div>`
+                        ).join('');
+                        
+                        // 프로필 이미지 복원
+                        if (data.profileImageUrl) {
+                            const img = document.getElementById('profileImagePreview');
+                            img.src = data.profileImageUrl;
+                            img.classList.add('show');
+                            document.getElementById('previewProfileImage').innerHTML = 
+                                `<img src="${data.profileImageUrl}" alt="프로필">`;
                         }
                         
                         // 프로필 복원
@@ -2059,6 +2163,7 @@
                         document.getElementById('profile-rows-list').innerHTML = '';
                         profileRows.forEach(row => renderProfileRowEditor(row));
                         updateProfilePreview();
+                        updateSNSLinks();
                         
                         // 섹션 복원
                         sections = data.sections || [];
