@@ -1,0 +1,1928 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>나무위키 스타일 에디터</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" rel="stylesheet">
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --namu-green: #2db400;
+            --namu-light-green: #e8f5e9;
+            --namu-dark-green: #1e7e34;
+            --border-color: #ddd;
+            --text-color: #222;
+            --bg-color: #fff;
+            --table-header-bg: var(--namu-green);
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* 왼쪽 편집 패널 */
+        .editor-panel {
+            width: 400px;
+            background: #f8f9fa;
+            border-right: 2px solid var(--border-color);
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .editor-panel h2 {
+            color: var(--namu-green);
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .image-upload-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .image-preview {
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .image-preview.show {
+            display: block;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: var(--namu-green);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--namu-dark-green);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .section-item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .section-type {
+            font-weight: 700;
+            color: var(--namu-green);
+        }
+
+        .color-theme {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid var(--border-color);
+        }
+
+        .color-input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .color-input-group input[type="color"] {
+            width: 60px;
+            height: 40px;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* 오른쪽 프리뷰 패널 */
+        .preview-panel {
+            flex: 1;
+            overflow-y: auto;
+            background: var(--bg-color);
+        }
+
+        #wiki-preview {
+            max-width: 1000px;
+            width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* 나무위키 스타일 */
+        .wiki-header {
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+
+        .wiki-title {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+
+        .wiki-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .wiki-category {
+            background: white;
+            padding: 8px 0;
+            margin-bottom: 15px;
+            font-size: 14px;
+            border: none;
+        }
+
+        .wiki-category-item {
+            color: var(--namu-green);
+        }
+
+        .wiki-content {
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+            margin-bottom: 40px;
+        }
+
+        .wiki-main {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .wiki-full-content {
+            clear: both;
+            width: 100%;
+        }
+
+        .wiki-toc {
+            background: white;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid #ddd;
+            max-width: 190px;
+        }
+
+        .wiki-toc-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #222;
+            margin-bottom: 15px;
+        }
+
+        .wiki-toc-list {
+            list-style: none;
+        }
+
+        .wiki-toc-list li {
+            padding: 4px 0;
+            color: #222;
+        }
+
+        .wiki-toc-list .toc-number {
+            color: var(--namu-green);
+            font-weight: 700;
+            margin-right: 5px;
+        }
+
+        .wiki-toc-list .toc-level-2 {
+            margin-left: 20px;
+        }
+
+        .wiki-toc-list .toc-level-3 {
+            margin-left: 40px;
+        }
+
+        .profile-box {
+            width: 350px;
+            background: white;
+            border: 2px solid var(--namu-green);
+            overflow: hidden;
+            position: sticky;
+            top: 20px;
+        }
+
+        .profile-image {
+            width: 100%;
+            height: 350px;
+            object-fit: cover;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+        }
+
+        .profile-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .profile-table tr {
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .profile-table tr:last-child {
+            border-bottom: none;
+        }
+
+        .profile-table th {
+            background: var(--table-header-bg);
+            color: white;
+            padding: 5px 10px;
+            text-align: center;
+            font-weight: 500;
+            width: 35%;
+        }
+
+        .profile-table td {
+            padding: 5px 10px;
+            background: white;
+        }
+
+        .wiki-section {
+            margin-bottom: 5px;
+        }
+
+        .wiki-heading {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .wiki-heading-2 {
+            font-size: 24px;
+            margin-top: 25px;
+        }
+
+        .wiki-heading-3 {
+            font-size: 20px;
+            margin-top: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .wiki-text {
+            line-height: 1.8;
+            color: var(--text-color);
+            margin-bottom: 10px;
+        }
+
+        .wiki-text blockquote {
+            border-left: 3px solid var(--namu-green);
+            padding-left: 15px;
+            margin: 0;
+            color: #666;
+            font-style: italic;
+            display: inline-block;
+        }
+
+        .intro-table {
+            width: 700px;
+            max-width: 700px;
+            border: none;
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 20px auto;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: var(--namu-green);
+            padding: 0 0 10px;
+            text-align: center;
+        }
+
+        .intro-table td {
+            padding: 5px 10px;
+            text-align: center;
+            border: none;
+        }
+
+        .intro-table .intro-first-row {
+            margin: 0;
+            padding: 0;
+        }
+
+        .intro-table .intro-row1 {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: white;
+            padding: 10px 0 7px 0;
+        }
+
+        .intro-table .intro-image {
+            flex: 0 0 auto;
+        }
+
+        .intro-table .intro-divider {
+            font-size: 40px;
+            color: #222;
+            font-weight: 100;
+            line-height: 1;
+            align-self: center;
+            position: relative;
+            top: -4px;
+        }
+
+        .intro-table .intro-name {
+            flex: 0 0 auto;
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            align-items: flex-start;
+            text-align: left;
+            color: #222;
+        }
+
+        .intro-table .intro-name-en {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .intro-table .intro-name-ko {
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        .intro-table .intro-members {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            padding: 0 0 8px 0;
+            color: #222;
+            border-bottom: 2px solid rgba(0, 0, 0, 0.2);
+            margin: 0 10px;
+        }
+
+        .intro-table .member-item {
+            background: transparent;
+            padding: 0;
+            font-size: 14px;
+            flex: 1;
+            text-align: center;
+        }
+
+        .intro-table .intro-links {
+            display: flex;
+            justify-content: space-around;
+            gap: 10px;
+            padding: 10px 0 5px 0;
+            color: #222;
+        }
+
+        .intro-table .intro-link-item {
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .wiki-table {
+            width: 100%;
+            max-width: 700px;
+            border-collapse: collapse;
+            margin: 20px auto;
+            border: 2px solid var(--namu-green);
+        }
+
+        .wiki-table th {
+            background: var(--table-header-bg);
+            color: white;
+            padding: 5px 10px;
+            font-weight: 500;
+            border: 1px solid var(--border-color);
+        }
+
+        .wiki-table td {
+            padding: 5px 10px;
+            border: 1px solid var(--border-color);
+            background: white;
+        }
+
+        .wiki-table td img {
+            display: block;
+            margin: 0 auto;
+            max-width: 100%;
+            height: auto;
+        }
+
+        .wiki-image {
+            max-width: 100%;
+            height: auto;
+            margin: 20px auto;
+            display: block;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+        }
+
+        .action-buttons {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .fab-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            background: var(--namu-green);
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transition: all 0.3s;
+        }
+
+        .fab-btn:hover {
+            background: var(--namu-dark-green);
+            transform: scale(1.1);
+        }
+
+        .section-number {
+            color: var(--namu-green);
+            margin-right: 8px;
+        }
+
+        .wiki-category {
+            background: var(--namu-light-green);
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #666;
+            border: 1px solid var(--border-color);
+        }
+
+        .wiki-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .wiki-meta-item {
+            cursor: pointer;
+        }
+
+        .wiki-meta-item:hover {
+            color: var(--namu-green);
+        }
+
+        .collapse-icon {
+            display: inline;
+        }
+
+        .collapse-icon:before {
+            color: #666;
+            content: "\f3d0";
+            float: left;
+            font-family: "Ionicons";
+            font-size: .8em;
+            font-weight: 400;
+            line-height: 1.8em;
+            margin: 0 .5rem 0 .2rem;
+            text-align: center;
+            width: .9em;
+        }
+
+        .sortable-sections {
+            min-height: 50px;
+        }
+
+        .drag-handle {
+            cursor: move;
+            color: #999;
+            margin-right: 10px;
+        }
+
+        .text-toolbar {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+
+        .text-toolbar button {
+            padding: 5px 10px;
+            border: 1px solid var(--border-color);
+            background: white;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .text-toolbar button:hover {
+            background: var(--namu-light-green);
+        }
+
+        .table-cell-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .merge-controls {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            display: flex;
+            gap: 2px;
+            z-index: 10;
+        }
+
+        .merge-btn {
+            width: 20px;
+            height: 20px;
+            border: 1px solid #ccc;
+            background: white;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 10px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .merge-btn:hover {
+            background: var(--namu-light-green);
+        }
+
+        .merge-btn.active {
+            background: var(--namu-green);
+            color: white;
+            border-color: var(--namu-green);
+        }
+
+        .profile-row-item {
+            background: white;
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .profile-row-item input {
+            flex: 1;
+            min-width: 0;
+            max-width: 100%;
+        }
+
+        .profile-row-item .btn {
+            padding: 5px 10px;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- 왼쪽 편집 패널 -->
+    <div class="editor-panel">
+        <h2>📝 위키 에디터</h2>
+        
+        <!-- 기본 프로필 정보 -->
+        <div class="form-group">
+            <label>제목</label>
+            <input type="text" id="pageTitle" placeholder="페이지 제목을 입력하세요" value="RIIZE">
+        </div>
+
+        <div class="form-group">
+            <label>분류 (쉼표로 구분)</label>
+            <input type="text" id="categories" placeholder="예: K-POP, 아이돌, SM Entertainment" value="K-POP, 보이그룹, SM">
+        </div>
+
+        <div class="form-group">
+            <label>소개 표 - 로고 이미지</label>
+            <input type="file" id="introImageFile" accept="image/*">
+            <input type="text" id="introImageUrl" placeholder="또는 이미지 URL" style="margin-top: 5px;">
+        </div>
+
+        <div class="form-group">
+            <label>헤더 글씨색 (소개표/프로필/본문표)</label>
+            <select id="headerTextColor">
+                <option value="#222">검정</option>
+                <option value="#fff">흰색</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>소개 표 - 그룹명 (영어)</label>
+            <input type="text" id="introGroupNameEn" placeholder="영어 그룹명" value="RIIZE">
+        </div>
+
+        <div class="form-group">
+            <label>소개 표 - 그룹명 (한글)</label>
+            <input type="text" id="introGroupNameKo" placeholder="한글 그룹명" value="라이즈">
+        </div>
+
+        <div class="form-group">
+            <label>소개 표 - 멤버 (쉼표로 구분)</label>
+            <input type="text" id="introMembers" placeholder="예: 쇼타로, 은석, 성찬..." value="쇼타로, 은석, 성찬, 원빈, 승한, 앤톤">
+        </div>
+
+        <div class="form-group">
+            <label>최근 수정 시각</label>
+            <input type="text" id="lastModified" placeholder="최근 수정 시각" value="2025-12-06 15:30:25">
+        </div>
+
+        <div class="form-group">
+            <label>프로필 이미지</label>
+            <div class="image-upload-group">
+                <input type="file" id="profileImage" accept="image/*">
+                <input type="text" id="profileImageUrl" placeholder="또는 이미지 URL 입력">
+                <img id="profileImagePreview" class="image-preview">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <button class="btn btn-primary" onclick="addProfileRow()" style="width: 100%;">➕ 프로필 항목 추가</button>
+        </div>
+
+        <div id="profile-rows-list">
+            <!-- 동적으로 추가되는 프로필 행들 -->
+        </div>
+
+        <h2 style="margin-top: 30px;">➕ 섹션 추가</h2>
+        <div class="button-group">
+            <button class="btn btn-primary" onclick="addSection('heading')">📌 제목</button>
+            <button class="btn btn-primary" onclick="addSection('text')">📄 텍스트</button>
+            <button class="btn btn-primary" onclick="addSection('collapse')">📋 축약</button>
+            <button class="btn btn-primary" onclick="addSection('table')">📊 표</button>
+            <button class="btn btn-primary" onclick="addSection('image')">🖼️ 이미지</button>
+        </div>
+
+        <!-- 추가된 섹션 목록 -->
+        <div id="sections-list" class="sortable-sections"></div>
+
+        <!-- 테마 설정 -->
+        <div class="color-theme">
+            <h2>🎨 테마 설정</h2>
+            <div class="form-group">
+                <label>메인 컬러</label>
+                <div class="color-input-group">
+                    <input type="color" id="themeColor" value="#2db400">
+                    <input type="text" id="themeColorText" value="#2db400">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 오른쪽 프리뷰 패널 -->
+    <div class="preview-panel">
+        <div id="wiki-preview">
+            <!-- 1. 대제목 -->
+            <div class="wiki-header">
+                <h1 class="wiki-title">RIIZE</h1>
+            </div>
+
+            <!-- 2. 최근 수정 -->
+            <div class="wiki-meta">
+                <span id="lastModifiedPreview">최근 수정: 2025-12-06 15:30:25</span>
+            </div>
+
+            <!-- 3. 분류 -->
+            <div id="wikiCategories" class="wiki-category" style="background: white !important; border-radius: 4px !important; padding: 8px 12px !important; border: 1px solid #ddd !important;">
+                <span style="color: #222; font-weight: normal;">분류:</span>
+                <span class="wiki-category-item">K-POP</span> | 
+                <span class="wiki-category-item">보이그룹</span> | 
+                <span class="wiki-category-item">SM</span>
+            </div>
+
+            <!-- 4. 특수 표 (아이돌 소개용) -->
+            <table class="intro-table">
+                <tr>
+                    <td>
+                        <div class="intro-first-row">
+                            <div class="intro-row1">
+                                <div class="intro-image" id="introImagePreview">로고</div>
+                                <div class="intro-divider">|</div>
+                                <div class="intro-name">
+                                    <div class="intro-name-en" id="introGroupNameEnPreview">RIIZE</div>
+                                    <div class="intro-name-ko" id="introGroupNameKoPreview">라이즈</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="intro-members" id="introMembersPreview">
+                            <div class="member-item">쇼타로</div>
+                            <div class="member-item">은석</div>
+                            <div class="member-item">성찬</div>
+                            <div class="member-item">원빈</div>
+                            <div class="member-item">승한</div>
+                            <div class="member-item">앤톤</div>
+                        </div>
+                        <div class="intro-links">
+                            <span class="intro-link-item">[ 한국 음반 ]</span>
+                            <span class="intro-link-item">[ 참여 음반 ]</span>
+                            <span class="intro-link-item">[ 관련 문서 ]</span>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+
+            <!-- 5. 목차 + 프로필 (세트) -->
+            <div class="wiki-content">
+                <div class="wiki-main">
+                    <div class="wiki-toc">
+                        <div class="wiki-toc-title">목차</div>
+                        <ul class="wiki-toc-list" id="tocList">
+                            <!-- 자동 생성됨 -->
+                        </ul>
+                    </div>
+                </div>
+
+                <aside class="profile-box">
+                    <div style="background: var(--namu-green); padding: 10px;">
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                            <div id="profileIntroImagePreview" style="flex: 0 0 auto;">로고</div>
+                            <div style="font-size: 40px; color: #222; font-weight: 100; line-height: 1; position: relative; top: -4px;">|</div>
+                            <div style="flex: 0 0 auto; font-size: 18px; font-weight: 700; display: flex; flex-direction: column; gap: 2px; align-items: flex-start; text-align: left; color: #222;">
+                                <div id="profileIntroNameEnPreview">RIIZE</div>
+                                <div id="profileIntroNameKoPreview" style="font-size: 14px; font-weight: 400;">라이즈</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="profile-image" id="previewProfileImage">
+                        프로필 이미지
+                    </div>
+                    <table class="profile-table" id="previewProfileTable">
+                        <!-- 동적으로 생성됨 -->
+                    </table>
+                </aside>
+            </div>
+
+            <!-- 6. 본문 (목차+프로필 세트 아래) -->
+            <div class="wiki-full-content">
+                <div id="dynamicContent">
+                    <!-- 동적으로 추가되는 콘텐츠 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 하단 액션 버튼 -->
+    <div class="action-buttons">
+        <button class="fab-btn" onclick="captureWiki()" title="캡처">📸</button>
+        <button class="fab-btn" onclick="saveWiki()" title="저장">💾</button>
+        <button class="fab-btn" onclick="loadWiki()" title="불러오기">📂</button>
+    </div>
+
+    <script>
+        let sections = [];
+        let sectionCounter = 0;
+        let profileRows = [];
+        let profileRowCounter = 0;
+
+        // 초기 프로필 행 추가
+        function initializeProfile() {
+            addProfileRow('이름', 'RIIZE');
+            addProfileRow('소속', 'SM Entertainment');
+            addProfileRow('데뷔', '2023년 9월 4일');
+            addProfileRow('멤버', '6명');
+            addProfileRow('장르', 'K-POP, R&B, Dance');
+        }
+
+        // 프로필 행 추가
+        function addProfileRow(header = '', value = '') {
+            profileRowCounter++;
+            const row = {
+                id: profileRowCounter,
+                header: header,
+                value: value
+            };
+            profileRows.push(row);
+            renderProfileRowEditor(row);
+            updateProfilePreview();
+        }
+
+        function renderProfileRowEditor(row) {
+            const container = document.getElementById('profile-rows-list');
+            const rowDiv = document.createElement('div');
+            rowDiv.className = 'profile-row-item';
+            rowDiv.id = `profile-row-${row.id}`;
+            
+            rowDiv.innerHTML = `
+                <input type="text" placeholder="항목명" value="${row.header}" 
+                       onkeyup="updateProfileRow(${row.id}, 'header', this.value)">
+                <input type="text" placeholder="내용" value="${row.value}" 
+                       onkeyup="updateProfileRow(${row.id}, 'value', this.value)">
+                <button class="btn btn-danger" onclick="removeProfileRow(${row.id})">×</button>
+            `;
+            
+            container.appendChild(rowDiv);
+        }
+
+        function updateProfileRow(rowId, field, value) {
+            const row = profileRows.find(r => r.id === rowId);
+            if (row) {
+                row[field] = value;
+                updateProfilePreview();
+            }
+        }
+
+        function removeProfileRow(rowId) {
+            profileRows = profileRows.filter(r => r.id !== rowId);
+            document.getElementById(`profile-row-${rowId}`).remove();
+            updateProfilePreview();
+        }
+
+        function updateProfilePreview() {
+            const table = document.getElementById('previewProfileTable');
+            let html = '';
+            
+            profileRows.forEach(row => {
+                if (row.header || row.value) {
+                    html += `
+                        <tr>
+                            <th>${row.header}</th>
+                            <td>${row.value}</td>
+                        </tr>
+                    `;
+                }
+            });
+            
+            table.innerHTML = html;
+        }
+
+        // 분류 및 메타 정보 업데이트
+        document.getElementById('categories').addEventListener('input', function() {
+            const cats = this.value.split(',').map(c => c.trim()).filter(c => c);
+            let html = '<span style="color: #222; font-weight: normal;">분류:</span> ';
+            html += cats.map(cat => `<span class="wiki-category-item">${cat}</span>`).join(' | ');
+            document.getElementById('wikiCategories').innerHTML = html;
+        });
+
+        document.getElementById('lastModified').addEventListener('input', function() {
+            document.getElementById('lastModifiedPreview').textContent = `최근 수정: ${this.value}`;
+        });
+
+        // 헤더 글씨색 변경 (소개표 + 프로필 + 본문표)
+        document.getElementById('headerTextColor').addEventListener('change', function() {
+            const color = this.value;
+            
+            // 소개표 전체
+            document.getElementById('introGroupNameEnPreview').style.color = color;
+            document.getElementById('introGroupNameKoPreview').style.color = color;
+            document.querySelectorAll('.intro-table .member-item').forEach(el => el.style.color = color);
+            document.querySelectorAll('.intro-table .intro-link-item').forEach(el => el.style.color = color);
+            document.querySelector('.intro-table .intro-divider').style.color = color;
+            
+            // 소개표 가로선
+            const borderColor = color === '#fff' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.2)';
+            document.querySelector('.intro-table .intro-members').style.borderBottomColor = borderColor;
+            
+            // 프로필 헤더
+            document.querySelectorAll('.profile-table th').forEach(el => el.style.color = color);
+            
+            // 본문 표 헤더
+            document.querySelectorAll('.wiki-table th').forEach(el => el.style.color = color);
+        });
+
+        // 특수 표 - 로고 이미지
+        document.getElementById('introImageFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const imgHTML = `<img src="${event.target.result}" style="max-height: 60px; border-radius: 6px;">`;
+                    document.getElementById('introImagePreview').innerHTML = imgHTML;
+                    document.getElementById('profileIntroImagePreview').innerHTML = imgHTML;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.getElementById('introImageUrl').addEventListener('input', function() {
+            if (this.value) {
+                const imgHTML = `<img src="${this.value}" style="max-height: 60px; border-radius: 6px;">`;
+                document.getElementById('introImagePreview').innerHTML = imgHTML;
+                document.getElementById('profileIntroImagePreview').innerHTML = imgHTML;
+            }
+        });
+
+        // 특수 표 - 그룹명
+        document.getElementById('introGroupNameEn').addEventListener('input', function() {
+            document.getElementById('introGroupNameEnPreview').textContent = this.value;
+            document.getElementById('profileIntroNameEnPreview').textContent = this.value;
+        });
+
+        document.getElementById('introGroupNameKo').addEventListener('input', function() {
+            document.getElementById('introGroupNameKoPreview').textContent = this.value;
+            document.getElementById('profileIntroNameKoPreview').textContent = this.value;
+        });
+
+        // 특수 표 - 멤버
+        document.getElementById('introMembers').addEventListener('input', function() {
+            const members = this.value.split(',').map(m => m.trim()).filter(m => m);
+            const html = members.map(m => `<div class="member-item">${m}</div>`).join('');
+            document.getElementById('introMembersPreview').innerHTML = html;
+        });
+
+        // 실시간 프리뷰 업데이트
+        document.getElementById('pageTitle').addEventListener('input', function() {
+            const title = this.value;
+            document.querySelector('.wiki-title').textContent = title;
+            
+            // 자동으로 소개표 영어명 동기화
+            document.getElementById('introGroupNameEn').value = title;
+            document.getElementById('introGroupNameEnPreview').textContent = title;
+            
+            // 프로필 이름 행 자동 동기화
+            const nameRow = profileRows.find(row => row.header === '이름');
+            if (nameRow) {
+                nameRow.value = title;
+                const input = document.getElementById(`profile-value-${nameRow.id}`);
+                if (input) {
+                    input.value = title;
+                }
+                updateProfilePreview();
+            }
+        });
+
+        // 프로필 이미지 업로드
+        document.getElementById('profileImage').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = document.getElementById('profileImagePreview');
+                    img.src = event.target.result;
+                    img.classList.add('show');
+                    
+                    document.getElementById('previewProfileImage').innerHTML = 
+                        `<img src="${event.target.result}" alt="프로필">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.getElementById('profileImageUrl').addEventListener('input', function() {
+            if (this.value) {
+                const img = document.getElementById('profileImagePreview');
+                img.src = this.value;
+                img.classList.add('show');
+                
+                document.getElementById('previewProfileImage').innerHTML = 
+                    `<img src="${this.value}" alt="프로필">`;
+            }
+        });
+
+        // 테마 컬러 변경
+        document.getElementById('themeColor').addEventListener('input', function() {
+            document.getElementById('themeColorText').value = this.value;
+            applyTheme(this.value);
+        });
+
+        document.getElementById('themeColorText').addEventListener('input', function() {
+            document.getElementById('themeColor').value = this.value;
+            applyTheme(this.value);
+        });
+
+        function applyTheme(color) {
+            document.documentElement.style.setProperty('--namu-green', color);
+            document.documentElement.style.setProperty('--table-header-bg', color);
+            
+            const lightColor = adjustColor(color, 40);
+            document.documentElement.style.setProperty('--namu-light-green', lightColor);
+        }
+
+        function adjustColor(color, percent) {
+            const num = parseInt(color.replace("#",""), 16);
+            const amt = Math.round(2.55 * percent);
+            const R = (num >> 16) + amt;
+            const G = (num >> 8 & 0x00FF) + amt;
+            const B = (num & 0x0000FF) + amt;
+            return "#" + (0x1000000 + (R<255?R<1?0:R:255)*0x10000 +
+                (G<255?G<1?0:G:255)*0x100 + (B<255?B<1?0:B:255))
+                .toString(16).slice(1);
+        }
+
+        // 섹션 추가
+        function addSection(type) {
+            sectionCounter++;
+            const section = {
+                id: sectionCounter,
+                type: type,
+                level: 1,
+                title: '',
+                content: '',
+                collapseLink: '', // 축약용
+                imageFile: null,
+                imageUrl: '',
+                imageWidth: '', // 이미지 너비
+                tableData: { 
+                    cols: 2,
+                    rows: 2,
+                    width: 700,
+                    data: [['', ''], ['', '']],
+                    cellStyles: {}, // { "row-col": { isHeader: true/false } }
+                    mergeInfo: [] // { row, col, colspan, rowspan }
+                }
+            };
+            sections.push(section);
+            renderSectionEditor(section);
+            updatePreview();
+        }
+
+        function renderSectionEditor(section) {
+            const sectionsList = document.getElementById('sections-list');
+            const sectionDiv = document.createElement('div');
+            sectionDiv.className = 'section-item';
+            sectionDiv.id = `section-${section.id}`;
+
+            let editorHTML = `
+                <div class="section-header">
+                    <span class="drag-handle">☰</span>
+                    <span class="section-type">${getSectionTypeLabel(section.type)}</span>
+                    <button class="btn btn-danger" onclick="removeSection(${section.id})" style="padding: 5px 10px; font-size: 12px;">삭제</button>
+                </div>
+            `;
+
+            switch(section.type) {
+                case 'heading':
+                    editorHTML += `
+                        <div class="form-group">
+                            <label>레벨</label>
+                            <select id="level-${section.id}" onchange="updateSectionData(${section.id}, 'level', this.value)">
+                                <option value="1">H1 (##)</option>
+                                <option value="2">H2 (###)</option>
+                                <option value="3">H3 (####)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>제목</label>
+                            <input type="text" id="title-${section.id}" 
+                                   placeholder="제목을 입력하세요" 
+                                   onkeyup="updateSectionData(${section.id}, 'title', this.value)">
+                        </div>
+                    `;
+                    break;
+                case 'text':
+                    editorHTML += `
+                        <div class="form-group">
+                            <label>내용</label>
+                            <div class="text-toolbar">
+                                <button onclick="insertTextFormat(${section.id}, 'bold')"><b>B</b></button>
+                                <button onclick="insertTextFormat(${section.id}, 'maincolor')">🎨 대표색</button>
+                                <button onclick="insertTextFormat(${section.id}, 'quote')">❝ 인용</button>
+                            </div>
+                            <textarea id="content-${section.id}" 
+                                      placeholder="텍스트 내용을 입력하세요&#10;&#10;서식:&#10;*굵게* = 굵게&#10;[대표색] = 대표색&#10;> 인용문 = 인용" 
+                                      onkeyup="updateSectionData(${section.id}, 'content', this.value)"
+                                      style="min-height: 120px;"></textarea>
+                        </div>
+                    `;
+                    break;
+                case 'collapse':
+                    editorHTML += `
+                        <div class="form-group">
+                            <label>링크 텍스트</label>
+                            <input type="text" id="collapseLink-${section.id}" 
+                                   placeholder="예: 이거 커스텀" 
+                                   onkeyup="updateSectionData(${section.id}, 'collapseLink', this.value)">
+                        </div>
+                    `;
+                    break;
+                case 'image':
+                    editorHTML += `
+                        <div class="form-group">
+                            <label>이미지 파일</label>
+                            <input type="file" id="imageFile-${section.id}" accept="image/*" 
+                                   onchange="handleImageUpload(${section.id}, this)">
+                        </div>
+                        <div class="form-group">
+                            <label>또는 이미지 URL</label>
+                            <input type="text" id="imageUrl-${section.id}" 
+                                   placeholder="이미지 URL을 입력하세요" 
+                                   onkeyup="updateSectionData(${section.id}, 'imageUrl', this.value)">
+                        </div>
+                        <div class="form-group">
+                            <label>이미지 가로 크기 (px)</label>
+                            <input type="number" id="imageWidth-${section.id}" 
+                                   placeholder="비워두면 자동" 
+                                   onkeyup="updateSectionData(${section.id}, 'imageWidth', this.value)"
+                                   style="width: 150px;">
+                        </div>
+                        <img id="imagePreview-${section.id}" style="max-width: 100%; margin-top: 10px; display: none;">
+                    `;
+                    break;
+                case 'table':
+                    editorHTML += `
+                        <div class="form-group">
+                            <label>표 크기</label>
+                            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                                <div>
+                                    <label style="font-size: 12px;">열:</label>
+                                    <input type="number" id="tableCols-${section.id}" value="2" min="1" max="10" 
+                                           style="width: 60px;" onchange="updateTableSize(${section.id})">
+                                </div>
+                                <div>
+                                    <label style="font-size: 12px;">행:</label>
+                                    <input type="number" id="tableRows-${section.id}" value="2" min="1" max="20" 
+                                           style="width: 60px;" onchange="updateTableSize(${section.id})">
+                                </div>
+                                <div>
+                                    <label style="font-size: 12px;">너비(px):</label>
+                                    <input type="number" id="tableWidth-${section.id}" value="700" min="100" max="1000" 
+                                           style="width: 80px;" onchange="updateTableWidth(${section.id})">
+                                </div>
+                            </div>
+                            <div id="table-editor-${section.id}"></div>
+                        </div>
+                    `;
+                    break;
+            }
+
+            sectionDiv.innerHTML = editorHTML;
+            sectionsList.appendChild(sectionDiv);
+
+            if (section.type === 'table') {
+                renderTableEditor(section);
+            }
+        }
+
+        function getSectionTypeLabel(type) {
+            const labels = {
+                'heading': '📌 제목',
+                'text': '📄 텍스트',
+                'collapse': '📋 축약',
+                'table': '📊 표',
+                'image': '🖼️ 이미지'
+            };
+            return labels[type] || type;
+        }
+
+        function insertTextFormat(sectionId, format) {
+            const textarea = document.getElementById(`content-${sectionId}`);
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const selectedText = textarea.value.substring(start, end);
+            let replacement = '';
+
+            switch(format) {
+                case 'bold':
+                    replacement = `*${selectedText || '굵게'}*`;
+                    break;
+                case 'maincolor':
+                    replacement = `[${selectedText || '대표색'}]`;
+                    break;
+                case 'quote':
+                    replacement = `> ${selectedText || '인용문'}`;
+                    break;
+            }
+
+            if (replacement) {
+                textarea.value = textarea.value.substring(0, start) + replacement + textarea.value.substring(end);
+                textarea.setSelectionRange(start, start + replacement.length);
+                updateSectionData(sectionId, 'content', textarea.value);
+            }
+        }
+
+        function handleImageUpload(sectionId, input) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const section = sections.find(s => s.id === sectionId);
+                    if (section) {
+                        section.imageFile = e.target.result;
+                        document.getElementById(`imagePreview-${sectionId}`).src = e.target.result;
+                        document.getElementById(`imagePreview-${sectionId}`).style.display = 'block';
+                        updatePreview();
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function updateSectionData(sectionId, field, value) {
+            const section = sections.find(s => s.id === sectionId);
+            if (section) {
+                section[field] = value;
+                updatePreview();
+            }
+        }
+
+        function removeSection(sectionId) {
+            sections = sections.filter(s => s.id !== sectionId);
+            document.getElementById(`section-${sectionId}`).remove();
+            updatePreview();
+        }
+
+        function updateTableSize(sectionId) {
+            const section = sections.find(s => s.id === sectionId);
+            if (!section) return;
+
+            const newCols = parseInt(document.getElementById(`tableCols-${sectionId}`).value);
+            const newRows = parseInt(document.getElementById(`tableRows-${sectionId}`).value);
+
+            // 행 조정
+            while (section.tableData.data.length < newRows) {
+                section.tableData.data.push(new Array(newCols).fill(''));
+            }
+            section.tableData.data = section.tableData.data.slice(0, newRows);
+
+            // 각 행의 열 수 조정
+            section.tableData.data = section.tableData.data.map(row => {
+                while (row.length < newCols) row.push('');
+                return row.slice(0, newCols);
+            });
+
+            section.tableData.cols = newCols;
+            section.tableData.rows = newRows;
+
+            if (!section.tableData.cellStyles) {
+                section.tableData.cellStyles = {};
+            }
+
+            renderTableEditor(section);
+            updatePreview();
+        }
+
+        function updateTableWidth(sectionId) {
+            const section = sections.find(s => s.id === sectionId);
+            if (!section) return;
+
+            const newWidth = parseInt(document.getElementById(`tableWidth-${sectionId}`).value);
+            section.tableData.width = newWidth;
+            updatePreview();
+        }
+
+        function renderTableEditor(section) {
+            const container = document.getElementById(`table-editor-${section.id}`);
+            
+            if (!section.tableData.mergeInfo) {
+                section.tableData.mergeInfo = [];
+            }
+            if (!section.tableData.cellStyles) {
+                section.tableData.cellStyles = {};
+            }
+            
+            let html = '<div style="margin: 15px 0;"><strong>데이터:</strong> <span style="font-size: 12px; color: #666;">(셀 클릭으로 선택)</span></div>';
+            
+            html += `
+                <div style="margin-bottom: 10px;">
+                    <button class="btn btn-primary" onclick="mergeSelectedCells(${section.id})" style="font-size: 12px; padding: 5px 10px;">
+                        병합하기
+                    </button>
+                    <button class="btn btn-secondary" onclick="toggleHeaderStyle(${section.id})" style="font-size: 12px; padding: 5px 10px;">
+                        헤더로 변경
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearSelection(${section.id})" style="font-size: 12px; padding: 5px 10px;">
+                        선택 해제
+                    </button>
+                    <button class="btn btn-danger" onclick="unmergeCell(${section.id})" style="font-size: 12px; padding: 5px 10px;">
+                        병합 해제
+                    </button>
+                </div>
+            `;
+            
+            html += '<div id="table-grid-' + section.id + '" style="display: grid; grid-template-columns: repeat(' + section.tableData.cols + ', 1fr); gap: 5px;">';
+            
+            section.tableData.data.forEach((row, rowIdx) => {
+                row.forEach((cell, cellIdx) => {
+                    const cellId = `cell-${section.id}-${rowIdx}-${cellIdx}`;
+                    const cellKey = `${rowIdx}-${cellIdx}`;
+                    const isImage = cell && cell.startsWith('<img');
+                    const isHeader = section.tableData.cellStyles[cellKey]?.isHeader || false;
+                    
+                    // 이미지 크기 가져오기
+                    let imageWidth = '';
+                    if (isImage && section.tableData.cellStyles[cellKey]?.imageWidth) {
+                        imageWidth = section.tableData.cellStyles[cellKey].imageWidth;
+                    }
+                    
+                    html += `
+                        <div class="table-cell-wrapper" id="${cellId}-wrapper" 
+                             onclick="toggleCellSelection(${section.id}, ${rowIdx}, ${cellIdx})"
+                             style="cursor: pointer; border: 2px solid transparent; padding: 3px; border-radius: 4px; background: ${isHeader ? '#e8f5e9' : 'white'};">
+                            ${isImage ? `
+                                <div style="display: flex; align-items: center; gap: 5px; font-size: 11px; color: #666; margin-bottom: 2px;">
+                                    <span>🖼️ 이미지 있음</span>
+                                    <input type="number" 
+                                           id="imgWidth-${section.id}-${rowIdx}-${cellIdx}"
+                                           value="${imageWidth}" 
+                                           placeholder="가로(px)" 
+                                           onclick="event.stopPropagation()"
+                                           onchange="updateImageWidth(${section.id}, ${rowIdx}, ${cellIdx}, this.value)"
+                                           style="width: 70px; padding: 2px 4px; font-size: 10px;">
+                                </div>
+                            ` : ''}
+                            <input type="text" value="${isImage ? '' : cell}" 
+                                   placeholder="셀 ${rowIdx + 1}-${cellIdx + 1}"
+                                   onclick="event.stopPropagation()"
+                                   onkeyup="updateTableCell(${section.id}, ${rowIdx}, ${cellIdx}, this.value)"
+                                   style="background: transparent;">
+                            <button onclick="event.stopPropagation(); addImageToTableCell(${section.id}, ${rowIdx}, ${cellIdx})" 
+                                    style="position: absolute; right: 8px; top: ${isImage ? '40px' : '11px'}; font-size: 11px; padding: 2px 6px; border: 1px solid #ddd; background: white; cursor: pointer;">
+                                🖼️
+                            </button>
+                        </div>
+                    `;
+                });
+            });
+            html += '</div>';
+
+            container.innerHTML = html;
+        }
+
+        // 헤더 스타일 토글
+        function toggleHeaderStyle(sectionId) {
+            const cellSet = selectedCells.get(sectionId);
+            if (!cellSet || cellSet.size === 0) {
+                alert('스타일을 변경할 셀을 선택해주세요.');
+                return;
+            }
+
+            const section = sections.find(s => s.id === sectionId);
+            if (!section) return;
+
+            cellSet.forEach(cellKey => {
+                if (!section.tableData.cellStyles[cellKey]) {
+                    section.tableData.cellStyles[cellKey] = {};
+                }
+                section.tableData.cellStyles[cellKey].isHeader = !section.tableData.cellStyles[cellKey].isHeader;
+            });
+
+            clearSelection(sectionId);
+            renderTableEditor(section);
+            updatePreview();
+        }
+
+        // 셀 선택 토글
+        const selectedCells = new Map(); // sectionId -> Set of "row-col"
+
+        function toggleCellSelection(sectionId, row, col) {
+            if (!selectedCells.has(sectionId)) {
+                selectedCells.set(sectionId, new Set());
+            }
+            
+            const cellSet = selectedCells.get(sectionId);
+            const cellKey = `${row}-${col}`;
+            const wrapper = document.getElementById(`cell-${sectionId}-${row}-${col}-wrapper`);
+            
+            if (cellSet.has(cellKey)) {
+                cellSet.delete(cellKey);
+                wrapper.style.border = '2px solid transparent';
+            } else {
+                cellSet.add(cellKey);
+                wrapper.style.border = '2px solid var(--namu-green)';
+            }
+        }
+
+        function clearSelection(sectionId) {
+            const cellSet = selectedCells.get(sectionId);
+            if (cellSet) {
+                cellSet.forEach(cellKey => {
+                    const [row, col] = cellKey.split('-').map(Number);
+                    const wrapper = document.getElementById(`cell-${sectionId}-${row}-${col}-wrapper`);
+                    if (wrapper) {
+                        wrapper.style.border = '2px solid transparent';
+                    }
+                });
+                cellSet.clear();
+            }
+        }
+
+        function mergeSelectedCells(sectionId) {
+            const cellSet = selectedCells.get(sectionId);
+            if (!cellSet || cellSet.size < 2) {
+                alert('최소 2개의 셀을 선택해주세요.');
+                return;
+            }
+
+            const cells = Array.from(cellSet).map(key => {
+                const [row, col] = key.split('-').map(Number);
+                return { row, col };
+            });
+
+            // 직사각형 영역인지 확인
+            const rows = cells.map(c => c.row);
+            const cols = cells.map(c => c.col);
+            const minRow = Math.min(...rows);
+            const maxRow = Math.max(...rows);
+            const minCol = Math.min(...cols);
+            const maxCol = Math.max(...cols);
+
+            const expectedCells = (maxRow - minRow + 1) * (maxCol - minCol + 1);
+            if (cells.length !== expectedCells) {
+                alert('직사각형 영역만 병합할 수 있습니다.');
+                return;
+            }
+
+            const section = sections.find(s => s.id === sectionId);
+            if (!section) return;
+
+            // 병합 정보 저장
+            const mergeInfo = {
+                row: minRow,
+                col: minCol,
+                rowspan: maxRow - minRow + 1,
+                colspan: maxCol - minCol + 1
+            };
+
+            // 기존 병합 정보 중 겹치는 것 제거
+            section.tableData.mergeInfo = section.tableData.mergeInfo.filter(m => {
+                return !(m.row >= minRow && m.row <= maxRow && m.col >= minCol && m.col <= maxCol);
+            });
+
+            section.tableData.mergeInfo.push(mergeInfo);
+            
+            clearSelection(sectionId);
+            renderTableEditor(section);
+            updatePreview();
+            alert('병합되었습니다!');
+        }
+
+        function unmergeCell(sectionId) {
+            const cellSet = selectedCells.get(sectionId);
+            if (!cellSet || cellSet.size !== 1) {
+                alert('병합을 해제할 셀 1개를 선택해주세요.');
+                return;
+            }
+
+            const cellKey = Array.from(cellSet)[0];
+            const [row, col] = cellKey.split('-').map(Number);
+            
+            const section = sections.find(s => s.id === sectionId);
+            if (!section) return;
+
+            // 해당 셀이 속한 병합 정보 찾기
+            const mergeIndex = section.tableData.mergeInfo.findIndex(m => 
+                row >= m.row && row < m.row + m.rowspan &&
+                col >= m.col && col < m.col + m.colspan
+            );
+
+            if (mergeIndex === -1) {
+                alert('병합된 셀이 아닙니다.');
+                return;
+            }
+
+            section.tableData.mergeInfo.splice(mergeIndex, 1);
+            
+            clearSelection(sectionId);
+            renderTableEditor(section);
+            updatePreview();
+            alert('병합이 해제되었습니다!');
+        }
+
+        function updateImageWidth(sectionId, row, col, width) {
+            const section = sections.find(s => s.id === sectionId);
+            if (!section) return;
+
+            const cellKey = `${row}-${col}`;
+            if (!section.tableData.cellStyles[cellKey]) {
+                section.tableData.cellStyles[cellKey] = {};
+            }
+            section.tableData.cellStyles[cellKey].imageWidth = width;
+            
+            updatePreview();
+        }
+
+        function addImageToTableCell(sectionId, rowIdx, cellIdx) {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        const section = sections.find(s => s.id === sectionId);
+                        if (section) {
+                            section.tableData.data[rowIdx][cellIdx] = `<img src="${event.target.result}" style="max-width: 150px; max-height: 150px;">`;
+                            renderTableEditor(section);
+                            updatePreview();
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+            
+            input.click();
+        }
+
+        function updateTableHeader(sectionId, idx, value) {
+            const section = sections.find(s => s.id === sectionId);
+            if (section) {
+                section.tableData.headers[idx] = value;
+                updatePreview();
+            }
+        }
+
+        function updateTableCell(sectionId, rowIdx, cellIdx, value) {
+            const section = sections.find(s => s.id === sectionId);
+            if (section) {
+                // 이미지가 아닌 경우에만 업데이트
+                if (!section.tableData.data[rowIdx][cellIdx].startsWith('<img')) {
+                    section.tableData.data[rowIdx][cellIdx] = value;
+                    updatePreview();
+                }
+            }
+        }
+
+        // 텍스트 서식 처리
+        function parseTextFormat(text) {
+            if (!text) return '';
+            
+            // 굵게 - *텍스트*
+            text = text.replace(/\*(.*?)\*/g, '<strong>$1</strong>');
+            
+            // 대표컬러 - [텍스트]
+            text = text.replace(/\[(.*?)\]/g, '<span style="color: var(--namu-green);">$1</span>');
+            
+            // 인용 - 인라인으로
+            text = text.replace(/^>\s*(.+)$/gm, '<span style="border-left: 3px solid var(--namu-green); padding-left: 15px; color: #666; font-style: italic; display: inline-block; margin: 0 5px;">$1</span>');
+            
+            // 줄바꿈
+            text = text.replace(/\n/g, '<br>');
+            
+            return text;
+        }
+
+        // 프리뷰 업데이트
+        function updatePreview() {
+            const container = document.getElementById('dynamicContent');
+            container.innerHTML = '';
+
+            let headingCounters = [0, 0, 0, 0];
+            let tocHTML = '';
+
+            sections.forEach(section => {
+                let sectionHTML = '';
+                
+                switch(section.type) {
+                    case 'heading':
+                        if (section.title) {
+                            const level = parseInt(section.level);
+                            headingCounters[level]++;
+                            
+                            for (let i = level + 1; i < headingCounters.length; i++) {
+                                headingCounters[i] = 0;
+                            }
+
+                            let number = '';
+                            for (let i = 1; i <= level; i++) {
+                                number += (number ? '.' : '') + headingCounters[i];
+                            }
+
+                            const headingClass = level === 1 ? 'wiki-heading' : 
+                                                 level === 2 ? 'wiki-heading wiki-heading-2' : 
+                                                 'wiki-heading wiki-heading-3';
+                            
+                            const headingId = `section-${number.replace(/\./g, '-')}`;
+                            
+                            sectionHTML = `
+                                <div class="wiki-section">
+                                    <h${level + 1} class="${headingClass}" id="${headingId}">
+                                        <span class="collapse-icon"></span>
+                                        <span class="section-number">${number}.</span>${section.title}
+                                    </h${level + 1}>
+                                </div>
+                            `;
+
+                            const tocClass = `toc-level-${level}`;
+                            tocHTML += `<li class="${tocClass}"><span class="toc-number">${number}.</span>${section.title}</li>`;
+                        }
+                        break;
+                    case 'text':
+                        if (section.content) {
+                            sectionHTML = `<div class="wiki-text">${parseTextFormat(section.content)}</div>`;
+                        }
+                        break;
+                    case 'collapse':
+                        const linkText = section.collapseLink || '이거 커스텀';
+                        sectionHTML = `
+                            <div class="wiki-collapse" style="padding: 12px 0; margin: 15px 0; display: flex; align-items: center; gap: 10px;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" style="flex-shrink: 0; fill: #666;">
+                                    <path d="M 6.5 2 C 5.1309372 2 4 3.1309372 4 4.5 L 4 19.5 C 4 20.869063 5.1309372 22 6.5 22 L 17.5 22 C 18.869063 22 20 20.869063 20 19.5 L 20 8 A 1.0001 1.0001 0 0 0 19.707031 7.2929688 L 14.707031 2.2929688 A 1.0001 1.0001 0 0 0 14 2 L 6.5 2 z M 6.5 4 L 13 4 L 13 8 A 1.0001 1.0001 0 0 0 14 9 L 18 9 L 18 19.5 C 18 19.786937 17.786937 20 17.5 20 L 6.5 20 C 6.2130628 20 6 19.786937 6 19.5 L 6 4.5 C 6 4.2130628 6.2130628 4 6.5 4 z M 15 5.4140625 L 16.585938 7 L 15 7 L 15 5.4140625 z M 9 10 A 1.0001 1.0001 0 1 0 9 12 L 15 12 A 1.0001 1.0001 0 1 0 15 10 L 9 10 z M 9 13 A 1.0001 1.0001 0 1 0 9 15 L 15 15 A 1.0001 1.0001 0 1 0 15 13 L 9 13 z M 9 16 A 1.0001 1.0001 0 1 0 9 18 L 13 18 A 1.0001 1.0001 0 1 0 13 16 L 9 16 z"></path>
+                                </svg>
+                                <span style="color: #222;">자세한 내용은 <span style="color: var(--namu-green);">${linkText}</span> 문서를 참고하십시오.</span>
+                            </div>
+                        `;
+                        break;
+                    case 'image':
+                        const imgSrc = section.imageFile || section.imageUrl;
+                        if (imgSrc) {
+                            const widthStyle = section.imageWidth ? `style="width: ${section.imageWidth}px; height: auto; display: block; margin: 20px auto;"` : '';
+                            sectionHTML = `<img src="${imgSrc}" class="wiki-image" alt="이미지" ${widthStyle}>`;
+                        }
+                        break;
+                    case 'table':
+                        if (section.tableData && section.tableData.data.length > 0) {
+                            const tableWidth = section.tableData.width || 700;
+                            sectionHTML = `<table class="wiki-table" style="max-width: ${tableWidth}px;"><tbody>`;
+                            
+                            const mergeInfo = section.tableData.mergeInfo || [];
+                            const cellStyles = section.tableData.cellStyles || {};
+                            const skippedCells = new Set();
+                            
+                            section.tableData.data.forEach((row, rowIdx) => {
+                                sectionHTML += '<tr>';
+                                row.forEach((cell, cellIdx) => {
+                                    const cellKey = `${rowIdx}-${cellIdx}`;
+                                    
+                                    if (skippedCells.has(cellKey)) {
+                                        return;
+                                    }
+                                    
+                                    const merge = mergeInfo.find(m => m.row === rowIdx && m.col === cellIdx);
+                                    const isHeader = cellStyles[cellKey]?.isHeader || false;
+                                    
+                                    let colspan = 1;
+                                    let rowspan = 1;
+                                    
+                                    if (merge) {
+                                        colspan = merge.colspan;
+                                        rowspan = merge.rowspan;
+                                        
+                                        for (let r = rowIdx; r < rowIdx + rowspan; r++) {
+                                            for (let c = cellIdx; c < cellIdx + colspan; c++) {
+                                                if (r !== rowIdx || c !== cellIdx) {
+                                                    skippedCells.add(`${r}-${c}`);
+                                                }
+                                            }
+                                        }
+                                    }
+                                    
+                                    const colspanAttr = colspan > 1 ? ` colspan="${colspan}"` : '';
+                                    const rowspanAttr = rowspan > 1 ? ` rowspan="${rowspan}"` : '';
+                                    const tag = isHeader ? 'th' : 'td';
+                                    
+                                    // 이미지 크기 적용
+                                    let cellContent = cell || '';
+                                    if (cellContent.startsWith('<img') && cellStyles[cellKey]?.imageWidth) {
+                                        const width = cellStyles[cellKey].imageWidth;
+                                        cellContent = cellContent.replace('<img', `<img style="width: ${width}px; height: auto;"`);
+                                    }
+                                    
+                                    sectionHTML += `<${tag}${colspanAttr}${rowspanAttr}>${cellContent}</${tag}>`;
+                                });
+                                sectionHTML += '</tr>';
+                            });
+                            sectionHTML += '</tbody></table>';
+                        }
+                        break;
+                }
+
+                if (sectionHTML) {
+                    container.innerHTML += sectionHTML;
+                }
+            });
+
+            document.getElementById('tocList').innerHTML = tocHTML || '<li style="color: #999;">목차가 비어있습니다</li>';
+        }
+
+        // 캡처 기능
+        async function captureWiki() {
+            const preview = document.getElementById('wiki-preview');
+            try {
+                const canvas = await html2canvas(preview, {
+                    backgroundColor: '#ffffff',
+                    scale: 1
+                });
+                
+                const link = document.createElement('a');
+                link.download = `wiki-${Date.now()}.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+                
+                alert('✅ 캡처가 완료되었습니다!');
+            } catch (error) {
+                alert('❌ 캡처 중 오류가 발생했습니다.');
+                console.error(error);
+            }
+        }
+
+        // 저장 기능
+        function saveWiki() {
+            const data = {
+                pageTitle: document.getElementById('pageTitle').value,
+                categories: document.getElementById('categories').value,
+                lastModified: document.getElementById('lastModified').value,
+                introImageUrl: document.getElementById('introImageUrl').value,
+                introGroupNameEn: document.getElementById('introGroupNameEn').value,
+                introGroupNameKo: document.getElementById('introGroupNameKo').value,
+                introMembers: document.getElementById('introMembers').value,
+                profileImageUrl: document.getElementById('profileImageUrl').value,
+                profileRows: profileRows,
+                sections: sections,
+                theme: document.getElementById('themeColor').value
+            };
+
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `wiki-${Date.now()}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+            
+            alert('✅ 파일이 저장되었습니다!');
+        }
+
+        // 불러오기 기능
+        function loadWiki() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                
+                reader.onload = function(event) {
+                    try {
+                        const data = JSON.parse(event.target.result);
+                        
+                        document.getElementById('pageTitle').value = data.pageTitle || '';
+                        document.getElementById('categories').value = data.categories || '';
+                        document.getElementById('lastModified').value = data.lastModified || '';
+                        document.getElementById('introImageUrl').value = data.introImageUrl || '';
+                        document.getElementById('introGroupNameEn').value = data.introGroupNameEn || '';
+                        document.getElementById('introGroupNameKo').value = data.introGroupNameKo || '';
+                        document.getElementById('introMembers').value = data.introMembers || '';
+                        document.getElementById('profileImageUrl').value = data.profileImageUrl || '';
+                        
+                        if (data.theme) {
+                            document.getElementById('themeColor').value = data.theme;
+                            document.getElementById('themeColorText').value = data.theme;
+                            applyTheme(data.theme);
+                        }
+                        
+                        // 프로필 복원
+                        profileRows = data.profileRows || [];
+                        profileRowCounter = Math.max(...profileRows.map(r => r.id), 0);
+                        document.getElementById('profile-rows-list').innerHTML = '';
+                        profileRows.forEach(row => renderProfileRowEditor(row));
+                        updateProfilePreview();
+                        
+                        // 섹션 복원
+                        sections = data.sections || [];
+                        sectionCounter = Math.max(...sections.map(s => s.id), 0);
+                        document.getElementById('sections-list').innerHTML = '';
+                        sections.forEach(section => {
+                            renderSectionEditor(section);
+                            if (section.type === 'heading') {
+                                document.getElementById(`level-${section.id}`).value = section.level;
+                                document.getElementById(`title-${section.id}`).value = section.title;
+                            } else if (section.type === 'text') {
+                                document.getElementById(`content-${section.id}`).value = section.content;
+                            } else if (section.type === 'image') {
+                                document.getElementById(`imageUrl-${section.id}`).value = section.imageUrl || '';
+                                if (section.imageFile) {
+                                    document.getElementById(`imagePreview-${section.id}`).src = section.imageFile;
+                                    document.getElementById(`imagePreview-${section.id}`).style.display = 'block';
+                                }
+                            } else if (section.type === 'table') {
+                                document.getElementById(`tableCols-${section.id}`).value = section.tableData.cols;
+                                document.getElementById(`tableRows-${section.id}`).value = section.tableData.rows;
+                            }
+                        });
+                        
+                        document.querySelector('.wiki-title').textContent = data.pageTitle;
+                        
+                        if (data.profileImageUrl) {
+                            document.getElementById('previewProfileImage').innerHTML = 
+                                `<img src="${data.profileImageUrl}" alt="프로필">`;
+                        }
+                        
+                        // 분류 및 메타 정보 업데이트
+                        const cats = data.categories.split(',').map(c => c.trim()).filter(c => c);
+                        let catsHTML = '<span style="color: #222; font-weight: normal;">분류:</span> ';
+                        catsHTML += cats.map(cat => `<span class="wiki-category-item">${cat}</span>`).join(' | ');
+                        document.getElementById('wikiCategories').innerHTML = catsHTML;
+                        document.getElementById('lastModifiedPreview').textContent = `최근 수정: ${data.lastModified}`;
+                        
+                        // 특수 표 복원
+                        if (data.introImageUrl) {
+                            document.getElementById('introImagePreview').innerHTML = 
+                                `<img src="${data.introImageUrl}" style="max-height: 60px; border-radius: 6px;">`;
+                        }
+                        document.getElementById('introGroupNameEnPreview').textContent = data.introGroupNameEn || '';
+                        document.getElementById('introGroupNameKoPreview').textContent = data.introGroupNameKo || '';
+                        const members = data.introMembers.split(',').map(m => m.trim()).filter(m => m);
+                        const membersHTML = members.map(m => `<div class="member-item">${m}</div>`).join('');
+                        document.getElementById('introMembersPreview').innerHTML = membersHTML;
+                        
+                        updatePreview();
+                        alert('✅ 파일을 불러왔습니다!');
+                    } catch (error) {
+                        alert('❌ 파일을 읽는 중 오류가 발생했습니다.');
+                        console.error(error);
+                    }
+                };
+                
+                reader.readAsText(file);
+            };
+            
+            input.click();
+        }
+
+        // 초기화
+        initializeProfile();
+        updatePreview();
+    </script>
+</body>
+</html>
