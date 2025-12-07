@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>나무위키 스타일 에디터</title>
+    <title>나무위키 스타일 에디터 (그룹모드 지원)</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
@@ -86,19 +86,8 @@
         .wiki-content { display: flex; gap: 30px; align-items: flex-start; margin-bottom: 40px; }
         .wiki-main { flex: 1; min-width: 0; }
         
-        /* 목차 수정 부분 */
         .wiki-toc { background: white; padding: 15px; margin-bottom: 30px; border: 1px solid #ccc; display: inline-block; min-width: 200px; }
-        .wiki-toc-title { 
-            font-size: 16px; 
-            font-weight: 700; 
-            color: #333; 
-            margin-bottom: 10px; 
-            text-align: center;
-            /* 캡처 시 강제 렌더링을 위한 수정 */
-            background: white;
-            position: relative;
-            z-index: 10;
-        }
+        .wiki-toc-title { font-size: 16px; font-weight: 700; color: #333; margin-bottom: 10px; text-align: center; background: white; position: relative; z-index: 10; }
         .toc-item { padding: 3px 0; font-size: 13px; color: #333; display: block; }
         .toc-number { color: var(--namu-green); font-weight: 700; margin-right: 5px; }
         .toc-text { color: #000 !important; }
@@ -135,6 +124,12 @@
         .member-item { font-size: 13px; }
         .intro-links { display: flex; justify-content: space-around; gap: 10px; padding: 10px 0 5px; color: #222; }
         .intro-link-item { font-size: 13px; font-weight: 700; }
+
+        /* 그룹 모드 테이블 스타일 추가 */
+        .group-image-table { width: 700px; margin: 0 auto 30px; border-collapse: collapse; border: 2px solid var(--namu-green); background: white; display: none; }
+        .group-img-cell { background: white; padding: 0; text-align: center; border-bottom: 2px solid var(--namu-green); vertical-align: middle; }
+        .group-img-cell img { width: 100%; display: block; height: auto; object-fit: cover; }
+        .group-member-cell { background: var(--namu-green); color: white; padding: 10px; text-align: center; font-weight: 700; font-size: 14px; word-break: keep-all; line-height: 1.5; }
 
         .wiki-table { width: 100%; border-collapse: collapse; margin: 20px 0; border: 2px solid var(--namu-green); }
         .wiki-table th { background: var(--table-header-bg); padding: 8px; border: 1px solid #ccc; font-weight: 600; font-size: 14px; color: #222; }
@@ -267,6 +262,13 @@
             <div id="tab-design" class="tab-content">
                 <h2>🎨 테마 설정</h2>
                 <div class="form-group"><label>메인 컬러</label><div class="color-input-group"><input type="color" id="themeColor" value="#2db400"><input type="text" id="themeColorText" value="#2db400"></div></div>
+                <div class="form-group">
+                    <label>레이아웃 모드</label>
+                    <div style="display:flex; gap:10px; margin-top:5px;">
+                        <label style="display:flex;align-items:center;cursor:pointer;font-weight:400;font-size:13px"><input type="radio" name="layoutMode" value="standard" checked onclick="updateLayoutMode()" style="margin-right:5px"> 기본 (개인)</label>
+                        <label style="display:flex;align-items:center;cursor:pointer;font-weight:400;font-size:13px"><input type="radio" name="layoutMode" value="group" onclick="updateLayoutMode()" style="margin-right:5px"> 그룹 (다인)</label>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -300,6 +302,12 @@
                         <div class="intro-members" id="introMembersPreview"></div>
                         <div class="intro-links"><span class="intro-link-item">[ 한국 음반 ]</span><span class="intro-link-item">[ 참여 음반 ]</span><span class="intro-link-item">[ 관련 문서 ]</span></div>
                     </td></tr>
+                </table>
+
+                <!-- 다인 모드용 그룹 이미지/멤버 표 -->
+                <table class="group-image-table" id="groupImageTable">
+                    <tr><td class="group-img-cell" id="groupImagePreview"></td></tr>
+                    <tr><td class="group-member-cell" id="groupMemberPreview"></td></tr>
                 </table>
 
                 <div class="wiki-content">
@@ -487,6 +495,8 @@
                             document.getElementById(previewId).innerHTML = img;
                             document.getElementById('profileIntroImagePreview').innerHTML = img;
                         }
+                        // 그룹 이미지 업데이트 추가
+                        updateLayoutMode();
                     };
                     r.readAsDataURL(file);
                 }
@@ -502,6 +512,8 @@
                         document.getElementById(previewId).innerHTML = img;
                         document.getElementById('profileIntroImagePreview').innerHTML = img;
                     }
+                    // 그룹 이미지 업데이트 추가
+                    updateLayoutMode();
                 }
             });
         }
@@ -525,6 +537,33 @@
             document.documentElement.style.setProperty('--table-header-bg', color);
             const r=parseInt(color.substr(1,2),16), g=parseInt(color.substr(3,2),16), b=parseInt(color.substr(5,2),16);
             document.documentElement.style.setProperty('--namu-light-green', `rgba(${r},${g},${b},0.1)`);
+            updateLayoutMode(); // 테마 변경시 그룹 테이블 배경색도 변경
+        }
+
+        // 레이아웃 모드 업데이트 (새 기능 + 가운뎃점 수정)
+        function updateLayoutMode() {
+            const mode = document.querySelector('input[name="layoutMode"]:checked').value;
+            const pImgContainer = document.getElementById('previewProfileImageContainer');
+            const gTable = document.getElementById('groupImageTable');
+            const gImg = document.getElementById('groupImagePreview');
+            const gMem = document.getElementById('groupMemberPreview');
+            const src = document.getElementById('profileImageUrl').value;
+            
+            if(mode === 'group') {
+                pImgContainer.style.display = 'none'; // 사이드 이미지 숨김
+                gTable.style.display = 'table';
+                gImg.innerHTML = src ? `<img src="${src}">` : '이미지 없음';
+                
+                // 멤버 이름 처리 (콤마 -> 가운뎃점 변환)
+                const rawText = document.getElementById('introMembers').value;
+                const formattedText = rawText.split(',').map(m => m.trim()).filter(m => m).join(' · ');
+                gMem.innerText = formattedText || '멤버를 입력하세요';
+                
+                gMem.style.backgroundColor = document.getElementById('themeColor').value;
+            } else {
+                pImgContainer.style.display = 'flex'; // 사이드 이미지 보임
+                gTable.style.display = 'none';
+            }
         }
 
         function updatePreviewAll() {
@@ -553,6 +592,8 @@
             document.querySelectorAll('.intro-table .member-item').forEach(el => el.style.color = color);
             const cats = document.getElementById('categories').value.split(',').filter(c=>c.trim()).map(c=>`<span class="wiki-category-item">${c.trim()}</span>`).join(' | ');
             document.getElementById('wikiCategories').innerHTML = `<span style="color:#222;font-weight:normal">분류:</span> ${cats}`;
+            
+            updateLayoutMode(); // 멤버 변경 시 그룹 테이블 업데이트
         }
 
         function addSection(type) {
@@ -670,7 +711,6 @@
             document.getElementById('emojiList').classList.toggle('show');
         }
 
-        // 수정된 이모지 삽입 함수 (윈도우 국기 문제 해결을 위해 이미지로 변환)
         function insertSpecificEmoji(id, emoji) {
             const set = selCells.get(id);
             if(!set || set.size === 0) return alert('셀을 선택해주세요.');
@@ -751,11 +791,9 @@
         }
         function unmergeCells(id) { const s = sections.find(x=>x.id===id); const set = selCells.get(id); if(!set||set.size!==1) return alert('셀 1개 선택 필요'); const [r,c] = Array.from(set)[0].split('-').map(Number); const idx = s.tableData.mergeInfo.findIndex(m => r>=m.r && r<m.r+m.rs && c>=m.c && c<m.c+m.cs); if(idx===-1) return alert('병합된 셀 아님'); s.tableData.mergeInfo.splice(idx,1); clearSel(id); renderTableModalContent(s); }
 
-        // 수정된 텍스트 파싱 함수 (줄바꿈 버그 해결)
         function parseText(txt) {
             if(!txt) return '';
             
-            // 인용문 처리를 먼저 수행하고, 문장의 시작(^)에서만 동작하게 해서 태그 꼬임 방지
             txt = txt.replace(/^>\s*(.*)/gm, '<div style="background:#f8f9fa;border-left:4px solid var(--namu-green);padding:5px 10px;margin:5px 0;letter-spacing:normal">$1</div>');
             
             txt = txt.replace(/\*(.*?)\*/g, '<strong style="letter-spacing:normal">$1</strong>');
@@ -907,13 +945,15 @@
         }
 
         function saveWiki() {
+            const layoutMode = document.querySelector('input[name="layoutMode"]:checked').value;
             const data = {
                 title: document.getElementById('pageTitle').value,
                 cats: document.getElementById('categories').value,
                 time: timeMode==='manual' ? document.getElementById('lastModified').value : null,
                 intro: { img: document.getElementById('introImageUrl').value, en: document.getElementById('introGroupNameEn').value, ko: document.getElementById('introGroupNameKo').value, mems: document.getElementById('introMembers').value, color: document.getElementById('headerTextColor').value },
                 profile: { img: document.getElementById('profileImageUrl').value, rows: profileRows, sns: { y: document.getElementById('snsYoutube').checked, x: document.getElementById('snsX').checked, i: document.getElementById('snsInstagram').checked } },
-                sections: sections, theme: document.getElementById('themeColor').value
+                sections: sections, theme: document.getElementById('themeColor').value,
+                layoutMode: layoutMode // 모드 저장
             };
             const b = new Blob([JSON.stringify(data)], {type:'application/json'});
             const u = URL.createObjectURL(b);
@@ -943,6 +983,12 @@
                         sections = d.sections || [];
                         document.getElementById('themeColor').value = d.theme || '#2db400';
                         
+                        // 레이아웃 모드 불러오기
+                        if (d.layoutMode) {
+                            const radio = document.querySelector(`input[name="layoutMode"][value="${d.layoutMode}"]`);
+                            if(radio) radio.checked = true;
+                        }
+
                         document.getElementById('pageTitle').dispatchEvent(new Event('input'));
                         document.getElementById('introImageUrl').dispatchEvent(new Event('input'));
                         document.getElementById('profileImageUrl').dispatchEvent(new Event('input'));
